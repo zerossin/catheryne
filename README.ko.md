@@ -21,6 +21,7 @@
 </p>
 
 <p align="center">
+  <a href="https://zerossin.com/catheryne/">설치 페이지</a> ·
   <a href="#시작하기">시작하기</a> ·
   <a href="#주요-기능">주요 기능</a> ·
   <a href="#사용-안내">사용 안내</a>

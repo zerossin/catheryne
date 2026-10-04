@@ -38,13 +38,7 @@ jobs:
           & ./apps/desktop/runtime-build/python.exe integrations/ai/test_mcp.py
           if($LASTEXITCODE){throw 'MCP tests failed'}
       - name: Korean and English desktop self-tests
-        run: |
-          foreach($language in @('ko-KR','en-US')){
-            $arguments=if($language -eq 'en-US'){@('--self-test','--english')}else{@('--self-test')}
-            $test=Start-Process ./apps/desktop/GenshinLauncher.exe -ArgumentList $arguments -WorkingDirectory ./apps/desktop -WindowStyle Hidden -Wait -PassThru
-            Get-Content ./apps/desktop/test-result.txt
-            if($test.ExitCode){throw "$language self-test failed"}
-          }
+        run: ./apps/desktop/test-desktop-ci.ps1
       - name: Fake-input core regression tests
         working-directory: core/story-control
         run: |

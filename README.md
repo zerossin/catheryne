@@ -21,6 +21,7 @@
 </p>
 
 <p align="center">
+  <a href="https://zerossin.com/catheryne/">Website</a> ·
   <a href="#getting-started">Getting started</a> ·
   <a href="#features">Features</a> ·
   <a href="#user-guide">User guide</a>
