@@ -1,0 +1,228 @@
+﻿{
+  "schemaVersion": 1,
+  "projectUrl": null,
+  "links": [
+    {
+      "name": "HoYoLAB",
+      "url": "https://www.hoyolab.com/",
+      "icon": "",
+      "group": "sites"
+    },
+    {
+      "name": "Paimon.moe",
+      "url": "https://paimon.moe/",
+      "icon": "",
+      "group": "sites"
+    },
+    {
+      "name": "Genshin Optimizer",
+      "url": "https://frzyc.github.io/genshin-optimizer/",
+      "icon": "",
+      "group": "sites"
+    },
+    {
+      "name": "FPS Unlocker · GitHub",
+      "url": "https://github.com/34736384/genshin-fps-unlock",
+      "icon": "",
+      "group": "tools"
+    },
+    {
+      "name": "원신 공식 사이트",
+      "url": "https://genshin.hoyoverse.com/ko/",
+      "group": "sites",
+      "icon": ""
+    },
+    {
+      "name": "HoYoPlay",
+      "url": "https://hoyoplay.hoyoverse.com/",
+      "group": "sites",
+      "icon": ""
+    },
+    {
+      "name": "HoYoLAB 육성 계산기",
+      "url": "https://act.hoyolab.com/ys/event/calculator-sea/index.html",
+      "group": "sites",
+      "icon": ""
+    },
+    {
+      "name": "KQM",
+      "url": "https://keqingmains.com/",
+      "group": "references",
+      "icon": ""
+    },
+    {
+      "name": "KQM Theorycrafting Library",
+      "url": "https://library.keqingmains.com/",
+      "group": "references",
+      "icon": ""
+    },
+    {
+      "name": "Genshin Impact Wiki",
+      "url": "https://genshin-impact.fandom.com/wiki/Genshin_Impact_Wiki",
+      "group": "references",
+      "icon": ""
+    },
+    {
+      "name": "Genshin Version News",
+      "url": "https://github.com/KQM-git/GINews",
+      "group": "references",
+      "icon": ""
+    },
+    {
+      "name": "Genshin Optimizer · GitHub",
+      "url": "https://github.com/frzyc/genshin-optimizer",
+      "group": "references",
+      "icon": ""
+    },
+    {
+      "name": "genshin-db",
+      "url": "https://github.com/theBowja/genshin-db",
+      "group": "references",
+      "icon": ""
+    },
+    {
+      "name": "genshin-db-dist",
+      "url": "https://github.com/theBowja/genshin-db-dist",
+      "group": "references",
+      "icon": ""
+    },
+    {
+      "name": "genshin.py",
+      "url": "https://github.com/seriaati/genshin.py",
+      "group": "references",
+      "icon": ""
+    },
+    {
+      "name": "hoyo-codes",
+      "url": "https://github.com/seriaati/hoyo-codes",
+      "group": "references",
+      "icon": ""
+    },
+    {
+      "name": "OpenAI Codex",
+      "url": "https://github.com/openai/codex",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "Python",
+      "url": "https://www.python.org/",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "Pillow",
+      "url": "https://pillow.readthedocs.io/",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "NumPy",
+      "url": "https://numpy.org/",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "Markdig",
+      "url": "https://github.com/xoofx/markdig",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": ".NET / WPF",
+      "url": "https://learn.microsoft.com/dotnet/desktop/wpf/",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "System.Memory",
+      "url": "https://www.nuget.org/packages/System.Memory",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "System.Buffers",
+      "url": "https://www.nuget.org/packages/System.Buffers",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "System.Runtime.CompilerServices.Unsafe",
+      "url": "https://www.nuget.org/packages/System.Runtime.CompilerServices.Unsafe",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "System.Numerics.Vectors",
+      "url": "https://www.nuget.org/packages/System.Numerics.Vectors",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "7-Zip",
+      "url": "https://www.7-zip.org/",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "libwebp",
+      "url": "https://developers.google.com/speed/webp/",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "NanumGothic",
+      "url": "https://github.com/google/fonts/tree/main/ofl/nanumgothic",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "레진 아이콘 자료",
+      "url": "https://gist.github.com/spencerwooo/2bf048c419cf5083be57ba1283f473ed",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "Windows Graphics Capture",
+      "url": "https://learn.microsoft.com/en-us/windows/uwp/audio-video-camera/screen-capture",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "Windows Advanced Color",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/direct3darticles/high-dynamic-range",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "Windows SDR white level",
+      "url": "https://learn.microsoft.com/en-us/windows/win32/api/wingdi/ns-wingdi-displayconfig_sdr_white_level",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "HDR Corrector",
+      "url": "https://github.com/mat100payette/HDR-Corrector",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "hdrcapture",
+      "url": "https://github.com/LDNKS094/hdrcapture",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": "HDR Screenshot · Tone mapping",
+      "url": "https://github.com/pjmdevelopment/HDR_Screenshot/blob/main/tonemapping.py",
+      "group": "development",
+      "icon": ""
+    },
+    {
+      "name": ".NET 8 Desktop Runtime",
+      "url": "https://dotnet.microsoft.com/en-us/download/dotnet/8.0",
+      "group": "development",
+      "icon": ""
+    }
+  ]
+}

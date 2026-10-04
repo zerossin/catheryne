@@ -1,0 +1,85 @@
+{
+  "date": "2026-10-01",
+  "baseline_commit": "c4e4bee",
+  "measured_source_commit": "35ff49b",
+  "performance_paths_main_commit": "8f7d425",
+  "conditions": {
+    "runs": 3,
+    "statistic": "median milliseconds per operation",
+    "settings_keys": 200,
+    "inventory_records": 1500,
+    "same_public_assets": true,
+    "network": false,
+    "game_input": false,
+    "private_account_data": false,
+    "warm_cache": true
+  },
+  "before": {
+    "settings_read": {
+      "iterations": 200,
+      "median_ms": 0.3265735
+    },
+    "criteria_read": {
+      "iterations": 20,
+      "median_ms": 7.637575000000001
+    },
+    "automatic_criterion": {
+      "iterations": 20,
+      "median_ms": 8.622630000000001
+    },
+    "settings_noop_write": {
+      "iterations": 40,
+      "median_ms": 7.00579
+    },
+    "credential_check": {
+      "iterations": 100,
+      "median_ms": 1.5219610000000001
+    },
+    "inventory_identity_scan": {
+      "iterations": 20,
+      "median_ms": 8.920190000000002
+    },
+    "character_detail": {
+      "iterations": 10,
+      "median_ms": 18.21507
+    },
+    "launcher_idle_tick": {
+      "iterations": 100,
+      "median_ms": 21.82332
+    }
+  },
+  "after": {
+    "settings_read": {
+      "iterations": 200,
+      "median_ms": 0.0271115
+    },
+    "criteria_read": {
+      "iterations": 20,
+      "median_ms": 0.08684
+    },
+    "automatic_criterion": {
+      "iterations": 20,
+      "median_ms": 0.032395
+    },
+    "settings_noop_write": {
+      "iterations": 40,
+      "median_ms": 0.4265225
+    },
+    "credential_check": {
+      "iterations": 100,
+      "median_ms": 0.013774
+    },
+    "inventory_identity_scan": {
+      "iterations": 20,
+      "median_ms": 0.16046500000000002
+    },
+    "character_detail": {
+      "iterations": 10,
+      "median_ms": 1.58817
+    },
+    "launcher_idle_tick": {
+      "iterations": 100,
+      "median_ms": 3.570115
+    }
+  }
+}

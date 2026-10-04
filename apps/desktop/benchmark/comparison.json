@@ -1,0 +1,54 @@
+{
+  "fixture": {
+    "network": false,
+    "synthetic_tasks": 300,
+    "history_events": 3000,
+    "result_reference_bytes": 16000,
+    "markdown_paragraphs": 300,
+    "same_portrait_views": 100,
+    "samples": 3,
+    "aggregation": "median",
+    "timings": "milliseconds per operation except portrait batch"
+  },
+  "results": {
+    "progress_2000": {
+      "before_ms": 0.430973,
+      "after_ms": 0.000659,
+      "reduction_percent": 99.85
+    },
+    "task_find_100": {
+      "before_ms": 11.97167,
+      "after_ms": 1.76279,
+      "reduction_percent": 85.28
+    },
+    "task_list_5": {
+      "before_ms": 207.54036,
+      "after_ms": 184.87976,
+      "reduction_percent": 10.92
+    },
+    "idle_tasks_20": {
+      "before_ms": 28.0138,
+      "after_ms": 0.0153,
+      "reduction_percent": 99.95
+    },
+    "markdown_initial_10": {
+      "before_ms": 79.5183,
+      "after_ms": 23.87461,
+      "reduction_percent": 69.98
+    },
+    "markdown_30": {
+      "before_ms": 1.03847,
+      "after_ms": 1.039513,
+      "reduction_percent": -0.1
+    },
+    "portraits_100": {
+      "before_ms": 64.5384,
+      "after_ms": 28.5794,
+      "reduction_percent": 55.72
+    },
+    "portrait_bitmaps": {
+      "before": 100,
+      "after": 1
+    }
+  }
+}

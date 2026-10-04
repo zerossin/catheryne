@@ -1,0 +1,35 @@
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Xml.Linq;
+internal static class NotificationTests {
+ static void Check(bool condition,string message){if(!condition)throw new Exception("Notifications: "+message);}
+ static void Reject(string link){try{NotificationTarget.Parse(link);}catch(ArgumentException){return;}throw new Exception("Unsafe activation accepted: "+link);}
+ internal static void Run(){
+  string root=Path.Combine(Path.GetTempPath(),"catheryne-notification-test-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
+  try{
+   var target=new NotificationTarget("Chat","synthetic-thread");Check(NotificationTarget.Parse(target.Link).Thread==target.Thread,"conversation roundtrip");
+   foreach(string link in new[]{"https://example.com/","catheryne-notification://open/?page=Play","catheryne-notification://open/?page=Story&action=resume","catheryne-notification://open/?page=Chat&thread=%22--play","catheryne-notification://open/?page=Daily&page=Story","catheryne-notification://open/?page=Daily#resume"})Reject(link);
+   var notice=new AppNotification("synthetic-question","A & B","<quoted>\u0001",target,NotificationPriority.Attention);var xml=XElement.Parse(notice.Xml(true));Check((string)xml.Attribute("scenario")=="reminder"&&(string)xml.Element("visual").Element("binding").Element("text")=="A & B","XML escapes content and uses persistent response reminders");Check((string)xml.Element("actions").Element("action").Attribute("activationType")=="foreground"&&!notice.Xml(true).Contains("loop="),"activation opens content without looping audio");
+   Check((string)XElement.Parse(notice.Xml(false,true)).Element("audio").Attribute("silent")=="true","native fixture suppresses audio as well as its popup");
+   Check(AppNotifications.IsActivationServer(new[]{"--notification-server"})&&AppNotifications.IsActivationServer(new[]{"--notification-server","-Embedding"})&&!AppNotifications.IsActivationServer(new[]{"--notification-server","--play"})&&!AppNotifications.IsActivationServer(new[]{"--notification-server","-Embedding","--play"}),"COM launch arguments stay bounded to notification activation");
+   var urgent=new AppNotification("urgent","Synthetic urgent","Synthetic risk",new NotificationTarget("Story"),NotificationPriority.Urgent);Check((string)XElement.Parse(urgent.Xml(true)).Attribute("scenario")=="urgent"&&(string)XElement.Parse(urgent.Xml(false)).Attribute("scenario")=="reminder","urgent scenario has an OS-compatible fallback");
+   int sent=0;var delivery=new AppNotifications(root,value=>{sent++;return 0;},tag=>{});var competing=new AppNotifications(root,value=>{sent++;return 0;},tag=>{});
+   Task.WaitAll(delivery.Send(notice),competing.Send(notice));Check(sent==1,"GUI/background sources cannot duplicate the same receipt");
+   int attempts=0;var retry=new AppNotifications(root,value=>++attempts==1?unchecked((int)0x80004005):0,tag=>{});var failed=new AppNotification("retry","Synthetic","Synthetic",new NotificationTarget("Daily"));Check(!retry.Send(failed).Result&&retry.Send(failed).Result&&attempts==2,"failed native submission leaves no successful receipt");
+   int disabled=0;var muted=new AppNotifications(root,value=>{disabled++;return 1;},tag=>{});var mutedNotice=new AppNotification("muted","Synthetic","Synthetic",target);Check(muted.Send(mutedNotice).Result&&!muted.Send(mutedNotice).Result&&disabled==1,"Windows-disabled notifications are respected without repeat/fallback");
+   var actions=new List<string>();using(var entered=new ManualResetEvent(false))using(var finish=new ManualResetEvent(false)){
+    var ordered=new AppNotifications(root,value=>{entered.Set();finish.WaitOne();actions.Add("show");return 0;},tag=>actions.Add("clear"));var question=ordered.Send(new AppNotification("ordered","Synthetic","Synthetic",target));entered.WaitOne();var resolved=ordered.Clear("ordered");finish.Set();Task.WaitAll(question,resolved);Check(string.Join(",",actions)=="show,clear","answer withdrawal cannot race ahead of queued submission");
+   }
+   var report=new Dictionary<string,object>{{"available",true},{"settings",new Dictionary<string,object>{{"notifications",true}}},{"plan_id","synthetic-plan"},{"stage","stage"},{"cursor",1},{"alert","no_progress_limit"},{"stopped",true},{"urgent",false},{"paused",false}};
+   Check(AppNotification.Controller(report).Priority==NotificationPriority.Attention,"stalled work asks for help without an emergency alarm");report["urgent"]=true;Check(AppNotification.Controller(report).Priority==NotificationPriority.Urgent,"unsafe stopped scene escalates urgency");report["paused"]=true;Check(AppNotification.Controller(report).Priority==NotificationPriority.Attention,"verified world pause does not escalate urgency");
+   report["alert"]="user_stop";Check(AppNotification.Controller(report)==null,"user stop is not an emergency");report["alert"]="combat_manual";CodexChat.Map(report["settings"])["notifications"]=false;Check(AppNotification.Controller(report)==null,"existing notification preference stays authoritative");CodexChat.Map(report["settings"])["notifications"]=true;
+   int episodes=0,cleared=0;var observer=new AppNotifications(root,value=>{episodes++;return 0;},tag=>cleared++);observer.ObserveController(report);report["cursor"]=2;observer.ObserveController(report);observer.Clear("barrier").Wait();Check(episodes==1,"same attention condition does not repeatedly alert as the journal advances");report["alert"]="resume_requires_observation";observer.ObserveController(report);observer.Clear("barrier").Wait();Check(cleared>=2,"resolved attention clears its Windows entry");report["alert"]="combat_manual";report["cursor"]=3;observer.ObserveController(report);observer.Clear("barrier").Wait();Check(episodes==2,"new attention episode can alert again");
+   string eventName="Local\\Catheryne.NotificationTest."+Guid.NewGuid().ToString("N");using(var first=PrivateIpc.Event(eventName,EventResetMode.AutoReset))using(var second=PrivateIpc.Event(eventName,EventResetMode.AutoReset)){second.Set();Check(first.WaitOne(1000)&&!first.WaitOne(0),"existing and newly created private wake signals share auto-reset navigation");}
+   string activationPath=Path.Combine(root,"runtime","notification-activation.json");Directory.CreateDirectory(Path.GetDirectoryName(activationPath));foreach(var at in new[]{DateTime.UtcNow.AddMinutes(-10),DateTime.UtcNow.AddHours(1)}){File.WriteAllText(activationPath,CatheryneTools.Json().Serialize(new{link=target.Link,at=at.ToString("o")}));Check(NotificationActivation.Take(root)==null&&!File.Exists(activationPath),"stale or future activation is discarded");}
+   NotificationActivation.Save(root,target);Check(NotificationActivation.Take(root).Link==target.Link&&NotificationActivation.Take(root)==null,"activation is consumed once without executing a tool");
+  }finally{Directory.Delete(root,true);}
+ }
+}

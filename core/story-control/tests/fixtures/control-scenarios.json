@@ -1,0 +1,377 @@
+[
+  {
+    "id": "dialogue-to-special-cancels",
+    "synthetic": true,
+    "events": [
+      {
+        "op": "observe",
+        "frame": 1,
+        "at": 0,
+        "state": {
+          "scene": "dialogue",
+          "dialogue_ui": true,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": []
+        },
+        "context": "room",
+        "expect": {}
+      },
+      {
+        "op": "resume",
+        "at": 0,
+        "expect": {}
+      },
+      {
+        "op": "recommend",
+        "at": 10,
+        "expect": {
+          "route": "rule",
+          "action": "advance"
+        }
+      },
+      {
+        "op": "observe",
+        "frame": 2,
+        "at": 100,
+        "state": {
+          "scene": "special",
+          "dialogue_ui": false,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": []
+        },
+        "context": "room",
+        "expect": {
+          "cancel_current": true
+        }
+      },
+      {
+        "op": "recommend",
+        "at": 101,
+        "expect": {
+          "route": "astra"
+        }
+      },
+      {
+        "op": "recommend",
+        "at": 102,
+        "expect": {
+          "route": "wait"
+        }
+      }
+    ]
+  },
+  {
+    "id": "choice-reorder-discards-old-result",
+    "synthetic": true,
+    "events": [
+      {
+        "op": "observe",
+        "frame": 1,
+        "at": 0,
+        "state": {
+          "scene": "dialogue",
+          "dialogue_ui": true,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": [
+            "계속한다",
+            "떠난다"
+          ]
+        },
+        "context": "room",
+        "expect": {}
+      },
+      {
+        "op": "resume",
+        "at": 0,
+        "expect": {}
+      },
+      {
+        "op": "recommend",
+        "at": 10,
+        "expect": {
+          "route": "jev"
+        }
+      },
+      {
+        "op": "observe",
+        "frame": 2,
+        "at": 100,
+        "state": {
+          "scene": "dialogue",
+          "dialogue_ui": true,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": [
+            "떠난다",
+            "계속한다"
+          ]
+        },
+        "context": "room",
+        "expect": {
+          "cancel_current": true
+        }
+      },
+      {
+        "op": "reply",
+        "at": 150,
+        "choice": "option_0",
+        "expect": {
+          "route": "discard"
+        }
+      }
+    ]
+  },
+  {
+    "id": "reset-with-identical-text",
+    "synthetic": true,
+    "events": [
+      {
+        "op": "observe",
+        "frame": 1,
+        "at": 0,
+        "state": {
+          "scene": "dialogue",
+          "dialogue_ui": true,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": [
+            "계속한다",
+            "떠난다"
+          ]
+        },
+        "context": "room",
+        "expect": {}
+      },
+      {
+        "op": "resume",
+        "at": 0,
+        "expect": {}
+      },
+      {
+        "op": "recommend",
+        "at": 10,
+        "expect": {
+          "route": "jev"
+        }
+      },
+      {
+        "op": "observe",
+        "frame": 2,
+        "at": 100,
+        "state": {
+          "scene": "dialogue",
+          "dialogue_ui": true,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": [
+            "계속한다",
+            "떠난다"
+          ]
+        },
+        "context": "reset-room",
+        "expect": {
+          "cancel_current": true
+        }
+      },
+      {
+        "op": "reply",
+        "at": 150,
+        "choice": "option_0",
+        "expect": {
+          "route": "discard"
+        }
+      }
+    ]
+  },
+  {
+    "id": "capture-stall-independent-of-model",
+    "synthetic": true,
+    "events": [
+      {
+        "op": "observe",
+        "frame": 1,
+        "at": 0,
+        "state": {
+          "scene": "dialogue",
+          "dialogue_ui": true,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": [
+            "계속한다",
+            "떠난다"
+          ]
+        },
+        "context": "room",
+        "expect": {}
+      },
+      {
+        "op": "resume",
+        "at": 0,
+        "expect": {}
+      },
+      {
+        "op": "recommend",
+        "at": 10,
+        "expect": {
+          "route": "jev"
+        }
+      },
+      {
+        "op": "tick",
+        "at": 751,
+        "expect": {
+          "route": "cancel",
+          "reason": "observation_expired"
+        }
+      },
+      {
+        "op": "reply",
+        "at": 800,
+        "choice": "option_0",
+        "expect": {
+          "route": "discard"
+        }
+      }
+    ]
+  },
+  {
+    "id": "stable-frames-do-not-starve-model",
+    "synthetic": true,
+    "events": [
+      {
+        "op": "observe",
+        "frame": 1,
+        "at": 0,
+        "state": {
+          "scene": "dialogue",
+          "dialogue_ui": true,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": [
+            "계속한다",
+            "떠난다"
+          ]
+        },
+        "context": "room",
+        "expect": {}
+      },
+      {
+        "op": "resume",
+        "at": 0,
+        "expect": {}
+      },
+      {
+        "op": "recommend",
+        "at": 10,
+        "expect": {
+          "route": "jev"
+        }
+      },
+      {
+        "op": "observe",
+        "frame": 2,
+        "at": 100,
+        "state": {
+          "scene": "dialogue",
+          "dialogue_ui": true,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": [
+            "계속한다",
+            "떠난다"
+          ]
+        },
+        "context": "room",
+        "expect": {
+          "cancel_current": false
+        }
+      },
+      {
+        "op": "reply",
+        "at": 150,
+        "choice": "option_0",
+        "expect": {
+          "route": "recommendation"
+        }
+      },
+      {
+        "op": "recommend",
+        "at": 160,
+        "expect": {
+          "route": "wait",
+          "reason": "awaiting_choice_change"
+        }
+      }
+    ]
+  },
+  {
+    "id": "manual-stop-stays-stopped",
+    "synthetic": true,
+    "events": [
+      {
+        "op": "observe",
+        "frame": 1,
+        "at": 0,
+        "state": {
+          "scene": "dialogue",
+          "dialogue_ui": true,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": []
+        },
+        "context": "room",
+        "expect": {}
+      },
+      {
+        "op": "resume",
+        "at": 0,
+        "expect": {}
+      },
+      {
+        "op": "stop",
+        "at": 10,
+        "expect": {
+          "route": "cancel"
+        }
+      },
+      {
+        "op": "observe",
+        "frame": 2,
+        "at": 20,
+        "state": {
+          "scene": "dialogue",
+          "dialogue_ui": true,
+          "branch_sensitive": false,
+          "perception_confidence": 1.0,
+          "choices": []
+        },
+        "context": "room",
+        "expect": {}
+      },
+      {
+        "op": "recommend",
+        "at": 21,
+        "expect": {
+          "route": "cancel"
+        }
+      },
+      {
+        "op": "resume",
+        "at": 22,
+        "expect": {
+          "route": "ready"
+        }
+      },
+      {
+        "op": "recommend",
+        "at": 23,
+        "expect": {
+          "route": "rule"
+        }
+      }
+    ]
+  }
+]

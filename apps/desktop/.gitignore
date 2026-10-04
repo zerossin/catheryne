@@ -1,0 +1,15 @@
+bin/
+obj/
+dist/
+*.exe
+test-result.txt
+
+scanner-build/
+
+/data/
+runtime-build/
+
+.build/
+native-build/
+image-build/
+Catheryne.Images.dll

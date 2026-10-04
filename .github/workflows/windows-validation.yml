@@ -1,0 +1,61 @@
+name: Windows validation
+on: [push, pull_request, workflow_dispatch]
+permissions:
+  contents: read
+jobs:
+  windows:
+    runs-on: windows-2022
+    timeout-minutes: 35
+    defaults:
+      run:
+        shell: pwsh
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+      - uses: actions/setup-python@v7
+        with:
+          python-version: '3.13'
+      - uses: actions/setup-dotnet@v6
+        with:
+          dotnet-version: '8.0.425'
+      - name: Build desktop and native helpers
+        run: ./apps/desktop/build.ps1 -Public
+      - name: Build maintained scanners
+        run: |
+          ./apps/desktop/build-scanner.ps1
+          $vswhere=Join-Path ${env:ProgramFiles(x86)} 'Microsoft Visual Studio/Installer/vswhere.exe'
+          $vs=& $vswhere -latest -products '*' -requires Microsoft.Component.MSBuild -property installationPath
+          if(!$vs){throw 'MSBuild not found'}
+          & (Join-Path $vs 'MSBuild/Current/Bin/MSBuild.exe') third_party/inventory-kamera/InventoryKamera.sln -restore -t:Build -p:Configuration=Release -p:Platform=x64 -verbosity:minimal -nologo
+          if($LASTEXITCODE){throw 'Inventory scanner build failed'}
+      - name: Build Python runtime and check AI adapter
+        run: |
+          ./apps/desktop/build-runtime.ps1 -BuildPython (Get-Command python).Source
+          & ./apps/desktop/runtime-build/python.exe -c 'import sys,unittest; sys.path.insert(0,"integrations/ai"); suite=unittest.defaultTestLoader.loadTestsFromNames(["test_game_catalog","test_transport"]); result=unittest.TextTestRunner().run(suite); sys.exit(not result.wasSuccessful())'
+          if($LASTEXITCODE){throw 'AI adapter tests failed'}
+          & ./apps/desktop/runtime-build/python.exe integrations/ai/test_mcp.py
+          if($LASTEXITCODE){throw 'MCP tests failed'}
+      - name: Korean and English desktop self-tests
+        run: |
+          foreach($language in @('ko-KR','en-US')){
+            $arguments=if($language -eq 'en-US'){@('--self-test','--english')}else{@('--self-test')}
+            $test=Start-Process ./apps/desktop/GenshinLauncher.exe -ArgumentList $arguments -WorkingDirectory ./apps/desktop -WindowStyle Hidden -Wait -PassThru
+            Get-Content ./apps/desktop/test-result.txt
+            if($test.ExitCode){throw "$language self-test failed"}
+          }
+      - name: Fake-input core regression tests
+        working-directory: core/story-control
+        run: |
+          $env:PYTHONPATH='src'
+          python -m unittest discover -s tests
+          if($LASTEXITCODE){throw 'Core tests failed'}
+          node --test integrations/sky/bridge.test.mjs
+          if($LASTEXITCODE){throw 'Bridge tests failed'}
+      - name: Public source and localization
+        run: |
+          python scripts/check-public.py --history
+          if($LASTEXITCODE){throw 'Public boundary check failed'}
+          python scripts/check-localization.py
+          if($LASTEXITCODE){throw 'Localization check failed'}

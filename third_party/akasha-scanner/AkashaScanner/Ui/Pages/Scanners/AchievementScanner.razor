@@ -1,0 +1,133 @@
+﻿@inherits RazorComponent
+@page "/scanners/achievement"
+
+@using Core.DataCollections
+@using Core.Scrappers
+@using Core.DataFiles
+
+@inject IConfig ScrapConfig
+@inject IAchievementCollection AchievementCollection
+@inject IScrapper<IAchievementConfig> AchievementScrapper
+@inject IDataFileRepository<AchievementOutput> AchievementDataFiles
+
+<Scanner Enabled="@IsScannerEnabled" OnSubmit="@HandleSubmit">
+    <Instructions>
+        <li>Update game data below if needed.</li>
+        <li>Start the game. Game is currently <ProcessStatusDisplay />.</li>
+        <li>Open your <b>Achievements</b> screen and select any category. You should see a search bar near the top left corner.</li>
+        <li>Some achievements have conflicting names and will be skipped during the scan. You may manually provide the status of these achievements below.</li>
+        <li>You may optionally select a previously scanned record so that completed achievements will not be scanned again.</li>
+        <li>Click the "Start" button below to begin scanning. Please do not move the mouse or press any buttons during the scan.</li>
+        <li>If you wish to interrupt the scan, minimize or exit the game (using Alt+Tab).</li>
+    </Instructions>
+    <DataUpdates>
+        <DataUpdate Title="Achievements"
+                    Collection="@AchievementCollection"
+                    Status="@AchievementCollectionStatus"
+                    EntryType="@(typeof(AchievementEntry))" />
+    </DataUpdates>
+    <Options>
+        <div class="resume-options">
+            <p>Progress is saved after each search. Select a progress record to resume. Only confirmed completed IDs are reused; missing IDs are scanned again.</p>
+            @if(SelectedFile != null) { <label><input type="checkbox" style="appearance:auto;width:18px;height:18px;margin-right:8px;" @bind="SameAccountConfirmed" /> This record belongs to the currently logged-in game account.</label> }
+        </div>
+        <div class="options">
+            @if (OverlappingAchievements.Any())
+            {
+                <AchievementEditor @bind-Value="ScrapConfig.AchievementOverrides"
+                                   Options="@OverlappingAchievements" />
+            }
+            <DataFileListOptional Title="Use an existing scan record"
+                                  TitleNegative="Do not use existing scan records"
+                                  FileList="@AvailableFiles"
+                                  @bind-Value="@SelectedFile" />
+        </div>
+    </Options>
+</Scanner>
+
+@code {
+    [Flux.GetDataCollectionStatus(typeof(AchievementEntry))]
+    public Flux.DataCollectionStatus AchievementCollectionStatus
+    {
+        get => _achievementCollectionStatus;
+        set
+        {
+            _achievementCollectionStatus = value;
+            if (value.IsAvailable)
+            {
+                var overlappingEntries = AchievementCollection.ListOverlappingAchievements();
+                OverlappingAchievements = IAchievementCollection.GroupByCategory(overlappingEntries);
+            }
+        }
+    }
+    private Flux.DataCollectionStatus _achievementCollectionStatus = default!;
+
+    [Flux.GetProcessStatus]
+    public ProcessStatus Status { get; set; }
+
+    private List<IDataFile<AchievementOutput>> AvailableFiles { get; set; } = new();
+    public IDataFile<AchievementOutput>? SelectedFile { get; set; } = default!;
+    private List<AchievementCategoryEntry> OverlappingAchievements { get; set; } = new();
+    private bool SameAccountConfirmed;
+    public bool IsScannerEnabled => AchievementCollectionStatus.IsAvailable && (SelectedFile == null || SameAccountConfirmed);
+
+    protected override async Task OnInitializedAsync()
+    {
+        Initialize();
+        AvailableFiles = AchievementDataFiles.List();
+        SelectedFile = null; // Never silently reuse another account's achievements.
+        await ScrapConfig.Load();
+    }
+
+    private bool HandleSubmit()
+    {
+        var overrides = new Dictionary<int, bool>();
+
+        // Map current achievement overrides
+        foreach (var category in OverlappingAchievements)
+        {
+            foreach (var achievement in category.Achievements)
+            {
+                foreach (var id in achievement.Ids)
+                {
+                    if (ScrapConfig.AchievementOverrides.TryGetValue(id, out var value) && value) overrides[id] = true;
+                }
+            }
+        }
+
+        ScrapConfig.AchievementOverrides = overrides;
+        ScrapConfig.Save();
+
+        // No automatic fallback after a corrupt record; preserve uncertainty.
+        if (SelectedFile == null)
+        {
+            return AchievementScrapper.Start(ScrapConfig);
+        }
+
+        if (!SameAccountConfirmed || !SelectedFile.Read(out var output)) return false;
+        var catalog = AchievementCollection.SelectMany(c => c.Achievements.SelectMany(a=>a.Ids.Select(id=>new {Id=id,Category=c.Id}))).ToDictionary(x=>x.Id,x=>x.Category);
+        if(output.Any(pair=>!catalog.TryGetValue(pair.Key,out var category)||category!=pair.Value)) return false;
+        // Merge only same-account, catalog-matching positive records.
+        var formData = new FormData
+            {
+                AchievementOverrides = new Dictionary<int, bool>(overrides)
+            };
+        foreach (var (key, _) in output)
+        {
+            formData.AchievementOverrides[key] = true;
+        }
+
+        return AchievementScrapper.Start(formData);
+    }
+
+    public override void Dispose()
+    {
+        base.Dispose();
+        AchievementScrapper.Dispose();
+    }
+
+    private class FormData : IAchievementConfig
+    {
+        public Dictionary<int, bool> AchievementOverrides { get; set; } = new();
+    }
+}

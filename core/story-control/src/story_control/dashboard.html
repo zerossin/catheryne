@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="ko">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Story Control · 진행 화면</title>
+<style>
+:root{color-scheme:dark;font-family:system-ui,sans-serif;background:#10151e;color:#e8eef7}*{box-sizing:border-box}body{max-width:1080px;margin:auto;padding:32px 24px}header,.row{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}h1{font-size:28px;margin:8px 0}h2{font-size:17px;margin:0 0 18px}.muted,small{color:#a9b6c8}header{margin-bottom:28px}.badge{background:#24354b;border-radius:20px;padding:8px 14px}.grid{display:grid;grid-template-columns:2fr 1fr;gap:18px}.card{background:#192230;border:1px solid #314058;border-radius:16px;padding:24px;margin-bottom:18px}.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin:24px 0}.metric strong{display:block;font-size:26px;font-variant-numeric:tabular-nums}.metric span{font-size:13px;color:#a9b6c8}button,select,input{font:inherit}button,select{border:1px solid #526783;border-radius:9px;background:#26364e;color:#fff;padding:11px 14px}button{cursor:pointer}button.primary{background:#acd8ff;color:#11283d;border:0}button.danger{background:#713536;border-color:#b76062}button:disabled{opacity:.4;cursor:default}label{display:block;margin:16px 0 8px}select{width:100%}input[type=number]{width:70px;padding:8px;background:#10151e;color:white;border:1px solid #526783;border-radius:7px}progress{width:100%;height:12px;accent-color:#a7d4ff;margin:16px 0}.notice{border-left:3px solid #e5b96d;padding:12px;background:#302c26;margin:16px 0;line-height:1.6}#error{color:#ffb4b4;white-space:pre-wrap}ol{padding-left:24px}li{padding:7px 0;overflow-wrap:anywhere}.events{font-size:13px;max-height:240px;overflow:auto}.done{color:#91d8bd}.active{color:#b6daff}p{line-height:1.6}.actions{display:flex;gap:10px;flex-wrap:wrap}footer{font-size:12px;color:#94a5ba;margin-top:20px}@media(max-width:700px){.grid{grid-template-columns:1fr}body{padding:20px 14px}.card{padding:18px}.metric strong{font-size:21px}}
+</style>
+<header><div><small>STORY CONTROL</small><h1 id="title">진행 화면</h1><span class="muted">맡긴 작업의 상태와 조작권을 한곳에서</span></div><span id="connection" class="badge">연결 중</span></header>
+<div id="error" role="alert"></div>
+<div class="grid"><main>
+<section class="card"><div class="row"><h2 id="stage">관측 대기</h2><span id="mode" class="badge">미확인</span></div>
+<p id="state">호스트에 연결하고 있습니다.</p><small id="observation"></small>
+<div class="metrics"><div class="metric"><strong id="elapsed">—</strong><span>누적 경과</span></div><div class="metric"><strong id="stageTime">—</strong><span>현재 단계</span></div><div class="metric"><strong id="wait">—</strong><span>AI 응답 대기</span></div></div>
+<div class="row"><span id="progressText">등록된 단계 확인 중</span><small>단계 수 기준 · 남은 시간 추정 아님</small></div><progress id="progress" value="0" max="1"></progress>
+<div class="notice" id="attention">화면과 상태를 확인한 뒤 조작권을 변경하세요.</div>
+<div class="actions"><button id="stop" class="danger" disabled>입력 중지</button><button id="take" disabled>내가 직접 조작</button><button id="resume" class="primary" disabled>AI에 다시 맡기기</button></div>
+<p class="muted"><small>입력 중지는 게임 일시정지를 뜻하지 않습니다. AI에 맡긴 뒤에는 연결된 AI가 새 화면을 확인해야 실행이 이어집니다.</small></p></section>
+<section class="card"><h2>임무 단계</h2><ol id="steps"></ol></section>
+<section class="card"><h2>최근 활동</h2><ol id="events" class="events"></ol></section>
+</main><aside><section class="card"><h2>실행 설정</h2><form id="settings">
+<label for="combat">전투 처리</label><select id="combat"><option value="auto">AI가 자동 수행</option><option value="manual">내가 직접 수행</option><option value="on_failure">반복 실패하면 내게 넘기기</option></select>
+<label for="failures">인계할 실패 횟수</label><input id="failures" type="number" min="1" max="10" value="2">
+<label><input id="notifications" type="checkbox" checked> 완료·도움 필요 시 알림</label>
+<p class="muted"><small>직접 전투를 선택하면 자리를 비운 동안 진행이 멈출 수 있습니다. 전투 판정은 연결된 AI의 최근 관측을 사용합니다.</small></p>
+<button id="save" type="submit" disabled>설정 저장</button><p id="saved" role="status"></p></form></section>
+<section class="card"><h2>알림 연결</h2><p class="muted">이 화면이 열린 브라우저에서 알립니다. 화면을 닫거나 절전 상태가 되면 알림을 보장하지 않습니다.</p><button id="permission">브라우저 알림 허용</button><p id="permissionState" role="status"></p></section>
+</aside></div><footer>상황은 마지막 관측 결과입니다. 이 화면은 게임을 직접 감지하거나 AI를 대신 실행하지 않습니다.</footer>
+<script src="/dashboard.js"></script>
+</html>

@@ -1,0 +1,7 @@
+# License scope
+
+Original Catheryne code and documentation are covered by the root MIT license. Existing module copyright notices and licenses remain applicable.
+
+Third-party software, fonts, extracted game data, and artwork retain their own licenses and ownership. See [third-party notices](apps/desktop/THIRD-PARTY.md) and the licenses beside vendored sources. The root MIT license does not relicense those materials or grant rights to HoYoverse or OpenAI names and imagery.
+
+The project owner created and supplied both the launcher icon and the welcome drawing (confirmed 2026-10-04). The welcome drawing was subsequently edited with AI. The current background is an AI-edited version of HoYoverse / COGNOSPHERE official Columbina artwork from the publicly released "A Traveler on a Winter's Night" wallpaper series, with its upper-right promotional title removed and bottom-left copyright retained; see the [source record](apps/desktop/branding/README.md). Copyright remains with COGNOSPHERE and the respective rights holders; this artwork is excluded from the root MIT license. Catheryne is an unofficial companion. The previous third-party backgrounds are no longer included in the current source or future installer payload. The repository also contains the Resin icon and scanner imagery; game artwork is outside the code license. Editing an image with AI does not resolve rights in its source image.

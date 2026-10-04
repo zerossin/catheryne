@@ -1,0 +1,53 @@
+{
+  "id": "demo-v1",
+  "title": "Synthetic example; not a game walkthrough",
+  "scope": "Demonstrate task registration only",
+  "sources": [],
+  "steps": [
+    {
+      "id": "travel",
+      "title": "Travel",
+      "modes": [
+        "navigation",
+        "interaction"
+      ],
+      "tools": [
+        "computer_use",
+        "sequence"
+      ],
+      "completion": "Operator supplies visible completion evidence",
+      "checkpoint": "Example only: verify in the actual task",
+      "failure_cost": "Example only: verify recovery"
+    },
+    {
+      "id": "talk",
+      "title": "Talk",
+      "modes": [
+        "dialogue",
+        "interaction"
+      ],
+      "tools": [
+        "computer_use",
+        "sequence"
+      ],
+      "completion": "Operator supplies visible completion evidence",
+      "checkpoint": "Example only: verify in the actual task",
+      "failure_cost": "Example only: verify recovery"
+    },
+    {
+      "id": "solve",
+      "title": "Solve",
+      "modes": [
+        "puzzle",
+        "interaction"
+      ],
+      "tools": [
+        "computer_use",
+        "sequence"
+      ],
+      "completion": "Operator supplies visible completion evidence",
+      "checkpoint": "Example only: verify in the actual task",
+      "failure_cost": "Example only: verify recovery"
+    }
+  ]
+}

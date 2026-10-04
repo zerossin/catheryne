@@ -1,0 +1,41 @@
+# Documentation
+
+[User guide](USER-GUIDE.md) · [한국어 사용 안내](USER-GUIDE.ko.md)
+
+The documents below are development, integration, and verification references. They are maintained with the source code and are not instructions for installing or using the app.
+
+## Development references
+
+- [업적 로컬 저장과 수집기 유지보수](ACHIEVEMENT-STORAGE.ko.md)
+- [AI 수용 기준과 회귀 시나리오](AI-ACCEPTANCE.ko.md)
+- [기존 기능과 AI 연결 대조](AI-FUNCTION-PARITY.ko.md)
+- [AI 연결 설계](AI-INTEGRATION.ko.md)
+- [앱 업데이트와 GitHub 릴리스](APP-UPDATES.ko.md)
+- [캣서린(Catheryne) 제품·구조 설계](ARCHITECTURE.ko.md)
+- [성유물 정리 판단 설계](ARTIFACT-REVIEW.ko.md)
+- [육성 평가 기준](BUILD-CRITERIA.ko.md)
+- [화면 캡처](CAPTURE.ko.md)
+- [캐릭터 상세와 육성 점수](CHARACTER-DEVELOPMENT.ko.md)
+- [계정 최신화 판정과 변경 기록](COLLECTION-REFRESH.ko.md)
+- [공개 자료 자동 갱신 점검](DATA-REFRESH.ko.md)
+- [나선비경·지맥 제압전 출전 준비](ENDGAME.ko.md)
+- [외부 도구 연결](EXTERNAL-TOOLS.ko.md)
+- [Catheryne 목표 완수와 오늘 할 일 — 기준 설계](GOAL-ORCHESTRATION.ko.md)
+- [HoYoLAB 계정 최신화](HOYOLAB-ACCOUNT.ko.md)
+- [캣서린 설치와 수명주기](INSTALLATION.ko.md)
+- [실제 사용자 흐름 인수 테스트](LIVE-ACCEPTANCE.ko.md)
+- [Localization](LOCALIZATION.md)
+- [재료 수집과 육성 계산](MATERIAL-INVENTORY.ko.md)
+- [구현 통합 — 2026-09-26](MIGRATION.md)
+- [모드 관리](MODS.ko.md)
+- [경량화 및 코드 구조 점검 — 2026-09-27](PERFORMANCE-AUDIT.ko.md)
+- [원석 명세서](PRIMOGEMS.ko.md)
+- [Catheryne 제품 흐름과 지식 배포 설계](PRODUCT-FLOW.ko.md)
+- [리딤코드 연동](REDEMPTION.ko.md)
+- [GitHub Releases 배포 구조](RELEASE-ARCHITECTURE.ko.md)
+- [수집 실행 계약](SCANNING.ko.md)
+- [용량과 저장소 유지보수](STORAGE-MAINTENANCE.ko.md)
+- [지원용 진단 기록](SUPPORT-DIAGNOSTICS.ko.md)
+- [환상극 관제](THEATER.ko.md)
+- [Language typography](TYPOGRAPHY.md)
+- [공통 UX 원칙](UX-PRINCIPLES.ko.md)

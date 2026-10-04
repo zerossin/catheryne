@@ -1,0 +1,197 @@
+[
+  {
+    "Version": "2.4",
+    "Start": "2022-01-05T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/2733.md"
+  },
+  {
+    "Version": "2.5",
+    "Start": "2022-02-16T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/2800.md"
+  },
+  {
+    "Version": "2.6",
+    "Start": "2022-03-30T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/2946.md"
+  },
+  {
+    "Version": "2.7",
+    "Start": "2022-05-31T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3021.md"
+  },
+  {
+    "Version": "2.8",
+    "Start": "2022-07-13T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3046.md"
+  },
+  {
+    "Version": "3.0",
+    "Start": "2022-08-24T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3144.md"
+  },
+  {
+    "Version": "3.1",
+    "Start": "2022-09-28T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3229.md"
+  },
+  {
+    "Version": "3.2",
+    "Start": "2022-11-02T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3311.md"
+  },
+  {
+    "Version": "3.3",
+    "Start": "2022-12-07T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3375.md"
+  },
+  {
+    "Version": "3.4",
+    "Start": "2023-01-18T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3440.md"
+  },
+  {
+    "Version": "3.5",
+    "Start": "2023-03-01T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3506.md"
+  },
+  {
+    "Version": "3.6",
+    "Start": "2023-04-12T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3561.md"
+  },
+  {
+    "Version": "3.7",
+    "Start": "2023-05-24T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3646.md"
+  },
+  {
+    "Version": "3.8",
+    "Start": "2023-07-05T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3708.md"
+  },
+  {
+    "Version": "4.0",
+    "Start": "2023-08-16T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3764.md"
+  },
+  {
+    "Version": "4.1",
+    "Start": "2023-09-27T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3850.md"
+  },
+  {
+    "Version": "4.2",
+    "Start": "2023-11-08T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/3924.md"
+  },
+  {
+    "Version": "4.3",
+    "Start": "2023-12-20T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/20230.md"
+  },
+  {
+    "Version": "4.4",
+    "Start": "2024-01-31T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/20322.md"
+  },
+  {
+    "Version": "4.5",
+    "Start": "2024-03-13T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/20406.md"
+  },
+  {
+    "Version": "4.6",
+    "Start": "2024-04-24T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/20471.md"
+  },
+  {
+    "Version": "4.7",
+    "Start": "2024-06-05T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/20551.md"
+  },
+  {
+    "Version": "4.8",
+    "Start": "2024-07-17T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/20628.md"
+  },
+  {
+    "Version": "5.0",
+    "Start": "2024-08-28T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/20723.md"
+  },
+  {
+    "Version": "5.1",
+    "Start": "2024-10-09T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/20799.md"
+  },
+  {
+    "Version": "5.3",
+    "Start": "2025-01-01T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/20907.md"
+  },
+  {
+    "Version": "5.4",
+    "Start": "2025-02-12T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21024.md"
+  },
+  {
+    "Version": "5.5",
+    "Start": "2025-03-26T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21067.md"
+  },
+  {
+    "Version": "5.6",
+    "Start": "2025-05-07T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21129.md"
+  },
+  {
+    "Version": "5.7",
+    "Start": "2025-06-18T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21205.md"
+  },
+  {
+    "Version": "5.8",
+    "Start": "2025-07-30T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21244.md"
+  },
+  {
+    "Version": "6.0",
+    "Start": "2025-09-10T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21315.md"
+  },
+  {
+    "Version": "6.3",
+    "Start": "2026-01-14T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21567.md"
+  },
+  {
+    "Version": "6.4",
+    "Start": "2026-02-25T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21617.md"
+  },
+  {
+    "Version": "6.5",
+    "Start": "2026-04-08T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21676.md"
+  },
+  {
+    "Version": "6.6",
+    "Start": "2026-05-20T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21730.md"
+  },
+  {
+    "Version": "6.7",
+    "Start": "2026-07-01T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21789.md"
+  },
+  {
+    "Version": "7.0",
+    "Start": "2026-08-12T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21857.md"
+  },
+  {
+    "Version": "7.1",
+    "Start": "2026-09-23T06:00:00",
+    "Source": "https://github.com/KQM-git/GINews/blob/master/archive/21946.md"
+  }
+]

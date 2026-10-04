@@ -1,0 +1,1502 @@
+[
+  {
+    "path": "apps/desktop/src/CompanionPanel.cs",
+    "origin": "launcher-integration",
+    "sha256": "f9dd119a508d9e012dc5a45f677f2bc38d4651064c290ee70f7b2377cfb493a2"
+  },
+  {
+    "path": "apps/desktop/src/Launcher.cs",
+    "origin": "launcher-integration",
+    "sha256": "fb3f05a2327ea31a60ae9e80ed36505a1740e620d9101585a07508e5d6fd96cf"
+  },
+  {
+    "path": "apps/desktop/src/Main.xaml",
+    "origin": "launcher-integration",
+    "sha256": "15c4a41007c0dd9fed26cd95cf3e616d9ae274955932f6f770a2154d2e846615"
+  },
+  {
+    "path": "apps/desktop/src/ProfileStore.cs",
+    "origin": "launcher-integration",
+    "sha256": "68de9807d1dc69be1cf4c82344f827ce66d8b49294289458b3017cfaeea3558a"
+  },
+  {
+    "path": "apps/desktop/src/Services.cs",
+    "origin": "launcher-integration",
+    "sha256": "87dfa5ac90223da74781045ad5998711583ef3d7635c63eb4013017499210d3d"
+  },
+  {
+    "path": "apps/desktop/src/ServiceTests.cs",
+    "origin": "launcher-integration",
+    "sha256": "1a49d31ae21688a8a112a4ba85b1967abd22ffb3aa6d77432ca7170c6db4c4f4"
+  },
+  {
+    "path": "apps/desktop/src/Setup.cs",
+    "origin": "launcher-integration",
+    "sha256": "23a6dab01729bb63dfbad19e6c56481a5b6968cb255a016a34d8cdf367604023"
+  },
+  {
+    "path": "apps/desktop/src/SetupPanel.cs",
+    "origin": "launcher-integration",
+    "sha256": "428c0b1cf7989eb922dd7acf323fe9f089195819948b47b6d35b0b0689af2889"
+  },
+  {
+    "path": "apps/desktop/src/UnlockerOptions.cs",
+    "origin": "launcher-integration",
+    "sha256": "f2175f4a66b2408267800cdb7cf84ba10caed6c20c9f4ad0faf47088a0a443af"
+  },
+  {
+    "path": "apps/desktop/build.ps1",
+    "origin": "launcher-integration",
+    "sha256": "8597171f758637f3ac0d9161a1078db4addb8babe0b85bb9b5b288fe8364ea0a"
+  },
+  {
+    "path": "apps/desktop/launcher.ico",
+    "origin": "launcher-integration",
+    "sha256": "131730abe6084732fad8352761e77f4d39b9a867c7b7677b7185c2044e0db477"
+  },
+  {
+    "path": "apps/desktop/LICENSE",
+    "origin": "launcher-integration",
+    "sha256": "9cd6635ea37cc5d8779235725f616629d0819bbb9e316907c94002b1ef2a5be6"
+  },
+  {
+    "path": "apps/desktop/THIRD-PARTY.md",
+    "origin": "launcher-integration",
+    "sha256": "7692f29d62750a7def956245c34455047a2a6d8f4c5a0ca119b378af1c746b69"
+  },
+  {
+    "path": "apps/desktop/README.md",
+    "origin": "launcher-integration",
+    "sha256": "5c684d934ca2f35e4930153ffeebb6ebd7cce87064e3ac7ff682b0d061dd9df9"
+  },
+  {
+    "path": "apps/desktop/INTEGRATION.md",
+    "origin": "launcher-integration",
+    "sha256": "c33ea8f78034471be95bbb4fc950079fa5107e296c347f1f07bf206a880d50b9"
+  },
+  {
+    "path": "apps/desktop/package.ps1",
+    "origin": "launcher-original",
+    "sha256": "46e69e85d5bf03591444bbb1b0c5e3f71b89b00bc2f7f8f961a8f2e77e13d2c8"
+  },
+  {
+    "path": "apps/desktop/install-shortcuts.ps1",
+    "origin": "launcher-original",
+    "sha256": "ac22e0594df00de660d17038f4c2630688da03757f9327b7ca787cdd51b43025"
+  },
+  {
+    "path": "core/story-control/.gitattributes",
+    "origin": "story-control@18f50fb",
+    "sha256": "d60f352d0db1404c70afb4bb8b2ca3fd1c610572aa40720e8a0b7baa7885418c"
+  },
+  {
+    "path": "core/story-control/.github/workflows/tests.yml",
+    "origin": "story-control@18f50fb",
+    "sha256": "f91f893f386cffa49554cf4549acd0087717fb9314ceceb3c9d894c3d13e1467"
+  },
+  {
+    "path": "core/story-control/.gitignore",
+    "origin": "story-control@18f50fb",
+    "sha256": "4ca613c69852bfcc6281bc20e966a2d7494d5750f700994f96d0f39816c7642d"
+  },
+  {
+    "path": "core/story-control/AGENTS.md",
+    "origin": "story-control@18f50fb",
+    "sha256": "524a47c8cea946ecd6f557f2bd568e2f45eae7057f23a6e29e3e46efc2aa91b6"
+  },
+  {
+    "path": "core/story-control/CONTRIBUTING.md",
+    "origin": "story-control@18f50fb",
+    "sha256": "458590fc9afe4641aa4d226844d882f8b667d69a1490373ecd7a0a3c1de65ae5"
+  },
+  {
+    "path": "core/story-control/LICENSE",
+    "origin": "story-control@18f50fb",
+    "sha256": "6fda6d9e5479b0335407c38f93850ac04883993a88cf59df5c526ef41e188faf"
+  },
+  {
+    "path": "core/story-control/MANIFEST.in",
+    "origin": "story-control@18f50fb",
+    "sha256": "45e893e63baa5c2c1000f6fdf803aea3d7056857b37425cb44d541b2fbd50af6"
+  },
+  {
+    "path": "core/story-control/README.md",
+    "origin": "story-control@18f50fb",
+    "sha256": "9f3afb3ef38f798a1f09c210a67295b00e73d252b48953502b903c4238dea547"
+  },
+  {
+    "path": "core/story-control/SECURITY.md",
+    "origin": "story-control@18f50fb",
+    "sha256": "5a443b5cdf0b1322a4d0279ac9cc5616c06657045672908db0dd542b8497b5f4"
+  },
+  {
+    "path": "core/story-control/docs/API.md",
+    "origin": "story-control@18f50fb",
+    "sha256": "f9166d4461548df93154f59f82720c92c1ecf86259c96eb218f467cb8f0c7035"
+  },
+  {
+    "path": "core/story-control/docs/DESIGN.md",
+    "origin": "story-control@18f50fb",
+    "sha256": "dfc2ace7b8d5035c3133cc8d5a0f14a71bbe1cacd260b6bb269966a7c7d630e5"
+  },
+  {
+    "path": "core/story-control/docs/OPERATOR-UI.md",
+    "origin": "story-control@18f50fb",
+    "sha256": "a7f61a7b996a6eef0d8e6b60d1b1a56b23c4fb59892b9620ec470aaca2f33c40"
+  },
+  {
+    "path": "core/story-control/docs/README.ko.md",
+    "origin": "story-control@18f50fb",
+    "sha256": "4f30bdbd1d7703771630b804eb106e2e856037e3601008b0fd299a0e9a1f0c7d"
+  },
+  {
+    "path": "core/story-control/docs/UI-VALIDATION.md",
+    "origin": "story-control@18f50fb",
+    "sha256": "ef69cddf3f7971c5b052772c03eb69f79a7365fa22bf4ed5d1043fa8c57954ba"
+  },
+  {
+    "path": "core/story-control/examples/demo.json",
+    "origin": "story-control@18f50fb",
+    "sha256": "3d499e40a0a5f8ee8d2083c80e573195df493b5beec80c48828e5c09ed122f38"
+  },
+  {
+    "path": "core/story-control/integrations/sky/bridge.mjs",
+    "origin": "story-control@18f50fb",
+    "sha256": "6ee0922dc8ce0090dfcbd09653212c98007a19d7f9631cbb3756e5281de1facc"
+  },
+  {
+    "path": "core/story-control/integrations/sky/bridge.test.mjs",
+    "origin": "story-control@18f50fb",
+    "sha256": "2931b7e1583e5595c870f610166e0ffccf21491c94b3ed0ab7e69d67a322501d"
+  },
+  {
+    "path": "core/story-control/pyproject.toml",
+    "origin": "story-control@18f50fb",
+    "sha256": "c9d7257f7be3777029f30fd6eb5039652f40395b42830ec67b6748e4b15b46f7"
+  },
+  {
+    "path": "core/story-control/src/story_control/__init__.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "91ec5a17aeeb7992a3405e72153ea8f9fbfcbc0bc32db3c86429d5e2db48e5db"
+  },
+  {
+    "path": "core/story-control/src/story_control/__main__.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "cf7390a2508a0fcad4777a4a629fc5212ab655cb45845975995f835676a834e3"
+  },
+  {
+    "path": "core/story-control/src/story_control/actions.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "99c7af5128c57f76fc95fd138c77babb2d38617ed64495e8979cf3d45dbca238"
+  },
+  {
+    "path": "core/story-control/src/story_control/cli.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "4a5a3dea52f891f298a62cbb7d1185e31d0c254f9573ce1de6fdaefd833996c8"
+  },
+  {
+    "path": "core/story-control/src/story_control/client.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "4545455a8768385edf0ce83e02798c389d7ec4d81cfa330d8a3b732754276b7e"
+  },
+  {
+    "path": "core/story-control/src/story_control/dashboard.html",
+    "origin": "story-control@18f50fb",
+    "sha256": "3de9e24cede0c87dd02f1d297ac9b86e5243f9d79c7fbbc24085cf5083009979"
+  },
+  {
+    "path": "core/story-control/src/story_control/dashboard.js",
+    "origin": "story-control@18f50fb",
+    "sha256": "0b7a41e3e89b496c15a7df63ff2b3d1c0df07a2c562c69044f0a04677acfc659"
+  },
+  {
+    "path": "core/story-control/src/story_control/director.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "8bd047176bfcc9ba38abbb29d1d7b28c17c6c64cb04f7e29a74ba548f174c10b"
+  },
+  {
+    "path": "core/story-control/src/story_control/keys.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "23aa2b1d342992f3013ad6bcd77bcd042a56bc2fcafdacfb49d5253d0eb471b2"
+  },
+  {
+    "path": "core/story-control/src/story_control/plan.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "48bac781f5574e5cbcbe14f8ffe6328a91ac69e45132a7e40ad1412d86863b25"
+  },
+  {
+    "path": "core/story-control/src/story_control/rpc.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "f38bdb7b37678f48010f8b54c4d1c6a74e6dc7282bf9fcfb92bcf0e62326dadc"
+  },
+  {
+    "path": "core/story-control/src/story_control/service.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "7e4498e901c850611d01239a5ba57f2e1e49f0f9afbe27ff1081552b8bef3457"
+  },
+  {
+    "path": "core/story-control/src/story_control/windows_input.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "018ee51288c49ca192e25ca75d35c10c31ea07b90f17b15f3cf5d71236381d54"
+  },
+  {
+    "path": "core/story-control/tests/test_actions.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "eedd3982b9c4b300236670b59bc5eefe194c8ee9bb70e2469276ec536f08f1f7"
+  },
+  {
+    "path": "core/story-control/tests/test_director.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "7d4c0866c2d7969679dfbcf3b29ba4a87a411314c0883c4c61d15d733e71c085"
+  },
+  {
+    "path": "core/story-control/tests/test_lifecycle.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "e596afe3f09298308daf7862ac81f3d2ecf50cbfec704697c2af80af1f405546"
+  },
+  {
+    "path": "core/story-control/tests/test_operator.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "91cd15f1e86885f56efd34b57023efdb433d1f6ae71086d80b31ee7ef4ea9ea3"
+  },
+  {
+    "path": "core/story-control/tests/test_plan.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "c5d0cd4ec9929a15c4c8ee123e092005f41059b793e4c437a179c2ecc617a4cc"
+  },
+  {
+    "path": "core/story-control/tests/test_windows_input.py",
+    "origin": "story-control@18f50fb",
+    "sha256": "8262480cd1e90ba9cde906b8695555ef7243a7d10646d396f890d7dfdc70a34c"
+  },
+  {
+    "path": "core/story-control/AGENTS.md",
+    "origin": "story-control-working-agreements",
+    "sha256": "137c3310f6d74c5428df598d3cf71059c76ba435781c2a72461bbaf543cb3f14"
+  },
+  {
+    "path": "modules/account/scripts/account.mjs",
+    "origin": "vault-account",
+    "sha256": "b6b2a9cc8ca4561592ad6192998a73f58f93f3fe357df95ec45848694755c685"
+  },
+  {
+    "path": "modules/account/scripts/account.test.mjs",
+    "origin": "vault-account",
+    "sha256": "c190d489a8916b8f6dc7e9d29af0984bae2e2776d72b14d9d1d9d4436df3969b"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_bridge.mjs",
+    "origin": "vault-gameplay",
+    "sha256": "8e2845dfd55d978dbd74fa39db54236f16e47ea66acf920a42339876f83c16dc"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_client.py",
+    "origin": "vault-gameplay",
+    "sha256": "73feacc6a44960a80c64a2ec04ee5339d9aaa1cf39fedf6a8802db07324a32ef"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_fixture.py",
+    "origin": "vault-gameplay",
+    "sha256": "09ef6378fb736ea2846ed3c29ecbc55708af8bf51e45c02e158a653ad00c9ca1"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_hud.py",
+    "origin": "vault-gameplay",
+    "sha256": "dedaa93ac2d8b3d3d1867a877b49a606d0ac17f20c7243f5dab874b814effe4d"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_preset.py",
+    "origin": "vault-gameplay",
+    "sha256": "6ed67bc8356d42339f4847e642a16bef9ed3faf8bed48559c05bbd0610fd667b"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_preview.py",
+    "origin": "vault-gameplay",
+    "sha256": "2a5ffa24368197f27c9e4e903a6122cbda2b93d06dd672bc5fe84e0549a2a987"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_recording.py",
+    "origin": "vault-gameplay",
+    "sha256": "dc2c6dcf3226a7a12d06007f1dc18d07dcedd2726fd438efb0b649a364389bcf"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_runtime.py",
+    "origin": "vault-gameplay",
+    "sha256": "0d8b1c165be11546195f11e34a7e689878f17759fb28b95bb7a0ef7c827b1ed8"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_runtime_eval.py",
+    "origin": "vault-gameplay",
+    "sha256": "31180f2b8b4c8545807a95d87a9acfa1e633529a8e687c58f79235e4de6ec554"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_service.py",
+    "origin": "vault-gameplay",
+    "sha256": "696df2da2e6d87923162028bb36b9a415f962efa0fed531e44582dcc2d907304"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_state.py",
+    "origin": "vault-gameplay",
+    "sha256": "2ed5e89925083ed06f2218fb87bb76907f5f54fe60ba4012dc2c535e0490f5dd"
+  },
+  {
+    "path": "labs/gameplay/scripts/combat_tools.py",
+    "origin": "vault-gameplay",
+    "sha256": "02a7f2b0bdc2c2627065c423ad5dae418d24932e29cf306d2ee7aa2cbbb9dd4d"
+  },
+  {
+    "path": "labs/gameplay/scripts/control_replay.py",
+    "origin": "vault-gameplay",
+    "sha256": "fef4e5b7e7a185db87508ba8dc2ec24b7c40b95ac25fe58ed94ffe53295594e7"
+  },
+  {
+    "path": "labs/gameplay/scripts/dialogue_clicker.py",
+    "origin": "vault-gameplay",
+    "sha256": "8b75e88333bd8b3175d347ba502f0856a08dc7f13b96b191e03329d6a85a8822"
+  },
+  {
+    "path": "labs/gameplay/scripts/game_capture.py",
+    "origin": "vault-gameplay",
+    "sha256": "e9929dd3d565062a5018247d0242d32ffb153d3871d29cda1a89b0fa3a4f1a23"
+  },
+  {
+    "path": "labs/gameplay/scripts/game_control.py",
+    "origin": "vault-gameplay",
+    "sha256": "d61557fba445c524e56bff874978aad8cd930346963c5064093de0b98588b1e7"
+  },
+  {
+    "path": "labs/gameplay/scripts/game_input.py",
+    "origin": "vault-gameplay",
+    "sha256": "73f8bd3729b5359d7aa9e3987df9f7345923c185c5ed157352686d2b52af0875"
+  },
+  {
+    "path": "labs/gameplay/scripts/game_policy.py",
+    "origin": "vault-gameplay",
+    "sha256": "20b4ba54ce7203d013eb7e24f8a79c7989ec070bef875757b8e01331bf7e677f"
+  },
+  {
+    "path": "labs/gameplay/scripts/game_session.py",
+    "origin": "vault-gameplay",
+    "sha256": "fd3c741ef3c671933b9b10d973a872753692ff0640e9cefc5f7a00df36fe7cd4"
+  },
+  {
+    "path": "modules/account/scripts/import.mjs",
+    "origin": "vault-account",
+    "sha256": "730fd68308051fc9a6d94e7dd0776831226c1ec4baa14a57dd59d89529548fce"
+  },
+  {
+    "path": "labs/gameplay/scripts/local_rpc.py",
+    "origin": "vault-gameplay",
+    "sha256": "a2c4b897829eafee1771682eb276fab1ec22fc85ecfa468a3b6f76336c0dc444"
+  },
+  {
+    "path": "labs/gameplay/scripts/play_progress.py",
+    "origin": "vault-gameplay",
+    "sha256": "2d26139f4c96688293d46edecdc7fda1ea4ef759d1fadcac894b801e7abffc6b"
+  },
+  {
+    "path": "labs/gameplay/scripts/record-combat.ps1",
+    "origin": "vault-gameplay",
+    "sha256": "2dafc6e348afcdca5b2119c20584faa27cef62386d4a7f0271435043bfac6139"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_combat_hud.py",
+    "origin": "vault-gameplay",
+    "sha256": "5f44b4a74f2984f2782955a8ac32ce61010e489401aacc45ae798c7b7bf1753a"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_combat_preset.py",
+    "origin": "vault-gameplay",
+    "sha256": "f35c6ee3762d1bc9cc09d1d39a8988912c9728ac55e8faf5bad098578067c42b"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_combat_recording.py",
+    "origin": "vault-gameplay",
+    "sha256": "79cd4efa25f8742b1c611a080e30cf0d2c894f78c0668ace5503cfae7737eea1"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_combat_runtime.py",
+    "origin": "vault-gameplay",
+    "sha256": "5726e643aac0ed30d179cd884b28a4b2b90fcfc2ee35e54e7c3529fbb9f70ad1"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_combat_service.py",
+    "origin": "vault-gameplay",
+    "sha256": "4474a9586fb89249d5fd49832bbbea1e6b5dc345ffff473bf918a5678c34692c"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_combat_state.py",
+    "origin": "vault-gameplay",
+    "sha256": "ff4465b1dbaecad83d0573c5497a6d2290006e54625491b79ecde43b7ccc8995"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_combat_tools.py",
+    "origin": "vault-gameplay",
+    "sha256": "ea8a932d3d363300911117ed065cd96b25fd84fd780edfa4ddde3f1126d53054"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_control_replay.py",
+    "origin": "vault-gameplay",
+    "sha256": "1bb37f74b00a1099ff507e1718ee306857be0420e05e84b14bccc7f813a6cb26"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_dialogue_clicker.py",
+    "origin": "vault-gameplay",
+    "sha256": "29af0375e433d8261283d024b9cc9e6fcb090e5b4c8987099229c2db708c6090"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_game_capture.py",
+    "origin": "vault-gameplay",
+    "sha256": "e3b06438749c674c6783a3ae3795a73d1ca038fbaa78bb6ac215e932b7fda273"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_game_control.py",
+    "origin": "vault-gameplay",
+    "sha256": "67e8fa269306e23a726a5e46eecec6dd428018bca85d452ad0678fb0fa2a6e58"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_game_input.py",
+    "origin": "vault-gameplay",
+    "sha256": "189003af8dd07a702e89bf32c2c3f86f8ccaf759923f45fc67c99b9d4a47fa8c"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_game_sequence.py",
+    "origin": "vault-gameplay",
+    "sha256": "111aa4b82ac6adbfc226d9d2ba8bdc3a841813bdf321fa05ffd923f0f1e2a937"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_game_session.py",
+    "origin": "vault-gameplay",
+    "sha256": "3fe641c99f44862151cdc0a60c5770045b45957668ec7ccac93e28fd1d0f2a00"
+  },
+  {
+    "path": "labs/gameplay/scripts/test_play_progress.py",
+    "origin": "vault-gameplay",
+    "sha256": "d60b33aa1ba2e262a6a45848bc906281ad6c20225c46957ab7d8053c530c9f31"
+  },
+  {
+    "path": "third_party/akasha-scanner/.gitattributes",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "45a7cbb7d9942ba7ffce0b20bc8dbe2d1196533bc6e4bd245871d77fb1eedfdc"
+  },
+  {
+    "path": "third_party/akasha-scanner/.gitignore",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "deab72c393f334c50b9f30ce730eca452ea0ac28f6544cdc2012017f6c9a902c"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner.sln",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f86e14fd1558121b6bb1c87deb19768275f62b88f0f8117bc126da7be1f5565e"
+  },
+  {
+    "path": "third_party/akasha-scanner/LICENSE.txt",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "002c2696d92b5c8cf956c11072baa58eaf9f6ade995c031ea635c6a1ee342ad1"
+  },
+  {
+    "path": "third_party/akasha-scanner/README.md",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "5d0bf69f4e93aadbed7ab70f02e4f93e5002beffe28ede113c2ae65a2b94f78f"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/.gitignore",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "2406add4097b3b562b467787e98f09f059365ac7aa4537cbb125c9d2b8af62aa"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/AkashaScanner.csproj",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "5f136b8d69b13bd4d6e0c69ee1377ab9605949d4a6c6d6ebcb691e7fe83b1c4d"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/app.manifest",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "b3cfd161fe23e8fd193a16cb504d52c4c0462b1ef833eaafa81320ca09b36f8c"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/AppHost.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "e35030f176f1e44fd5722efe90e2edb3855954413113c591ed631e90e1bc781f"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/appsettings.json",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "9c77d351e9a1d66b4bc212bcbadeb628585c6b71d9a3b4ca60b9eac640a966fa"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Logo.ico",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "4e45154ce3fe83c6f5526172ca33af4b6b1eb2019e454b0de7fd195eda85e11a"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/MainWindow.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "593b601701202542734563a44e76de3eb3c2aa1bf30b83cb83938c07f05f74ad"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/MainWindow.Designer.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "e19f9150b9463a7fec06257a21356e66b8e19c8447477927d22c18b6fb21d101"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/MainWindow.resx",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "0be147e16323da3d335f893a5d37f0c8a165e6e95b5dae285eb3b09778785e26"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Program.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "8a43eeeb25edc5744179197582b7dbf8a5ce82d1b9dc204c0ee0660de12b9caf"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/_Imports.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "311347a7215157eaa36d42a464f2e3edae1d4ba2add85a28d9a9c457db5ac8c3"
+  },
+  {
+    "path": "third_party/akasha-scanner/.github/ISSUE_TEMPLATE/bug_report.md",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "322e70c86bf77559dbdcf4a1aa8ead3cade0cb02d5dc1626be30734af5c9e57d"
+  },
+  {
+    "path": "third_party/akasha-scanner/.github/ISSUE_TEMPLATE/feature_request.md",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1f48c52f209a971b8e7eae4120144d28fcf8ee38a7778a7b4d8cf1ab356617d2"
+  },
+  {
+    "path": "third_party/akasha-scanner/.github/workflows/dotnet.yml",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "25bb92150308f9f2b92f7e36bd7611d56e6c6e887d4db1090dedf0fc5752ee43"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/CoreServiceCollectionExtension.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "9c2b682f4b14da12d5f7320d38b6dff0b6039bf1be2f348cdc0d6d0d08dbd264"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Resources/InGameFont.ttf",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1aca6ba95b0a50a4e5d8199a00440dd48af185e53e9d431c77c953553695c760"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/App.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "129f0fea25ca7f45991d11ecaa8bbcb4a026f5fca238931eb3c16eb40343eb54"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/AppEvents.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "c6ec0003feb5622493175c9f623a9ef57963371682426710ce2a4f4997c81c32"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/RazorComponent.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f095f45253b800d15ef7113508b793055a1e3cf2f26c41314ca933ebab391f69"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/UIPrerequisites.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "3d3b38fd309e5265d1a297f6f187ede0b5f3ab9d01c32f8ea0fd7970fb04afb5"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/wwwroot/index.html",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "17787996511b0d5236bfe2d3303f2d3a7e7d779d7dc8ae4e0056b5139f898530"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Achievements/AchievementDataFileRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "cd6b96f50a9d63d5572f4855c04f1eb47ecc062d1d2be008780f3cc3f1a89183"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Achievements/AchievementResultHandler.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "d6d8fdbca4fbca16f612394401077f8e08e2077caa0055e2c53148cd34a5d39d"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Achievements/AchievementScrapper.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "67f66c0c525b3515bd2eb75f6b7051f19e18e98a71336a42d0ef3634ada0afae"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Achievements/AchievementScrapPlan.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "6437db894773a012503f21f44ef2fa7aecdfb269099ae66e7f8b2dca571102ab"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Artifacts/ArtifactDataFileRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "6ea838bedad721608c02a24ae1e52500de830c973e3e6fecc4f0c55b53c5949d"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Artifacts/ArtifactResultHandler.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "de7692a7d631e55423a03d2a6e33b604aea639e86ea61733bbed42f3a84dd6bb"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Artifacts/ArtifactScrapper.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "c0652b9418f6ce335e9c812b90d8927dbff03c5c2a8b7d7a7b75e76924ec62a1"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Artifacts/ArtifactScrapPlan.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "7103b648d9cc144570582645ea8bc99d258a27f88463763d835915743cbd7085"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Artifacts/ArtifactSubstatValues.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "49988db578bfa89c7fead2819cba39650b549c77144a49eb804f4f51be95cfe0"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Artifacts/ExperimentalArtifactScrapper.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "4ce425d7cdb4538b5d21d798487f2ecb9d01eae84a7a6aeaea116b4688d7e625"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Outputs.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "25d9856d5c1438028fead528eb5b3e65f006c39e0ea5cfbea3b716977150d6aa"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/ProcessStatus.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "a5849a6f3416eff5831f33638c4c35c5911cddc50dba14e6605bbccb2dd7cb80"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Characters/CharacterDataFileRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "ab534906267ebf8d37be2e37b8f195d8d36d6a41acdbbe99b4f0806bbdbefdcc"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Characters/CharacterResultHandler.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "5b7f29d07c81fb6a33ae88a97284a9dfaa7a6316a25016afd3039564e84f387e"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Characters/CharacterScrapper.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "b9ba6323f8c995b11823112f526e1a9edcb3b14b8e96b661492e540f9b60ba48"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Characters/CharacterScrapPlan.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "9040f2a5cd4b2e340861a6dded755555e8bb02a898ee6a3b1d76331de7801023"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Common/AppUpdate.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "ebc1c8a8562bf49a331cc2844ac2b733092ebc5b3e23c0289bcbde2d5e80f899"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Common/GameWindow.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "36454e568c5298b86cdc7809926ca36884f8d5f078b877d9234f76a3c7f7b35f"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Common/ObjectPool.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f4731b063d19d948b38fc3812ac3bbc3dc3ccb9e3ecd75890e619138da541e75"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Common/TaskQueue.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "97e9e5da3713610267e9f1fc5daf373c718e0d9c630ab71672339d28b9b1253e"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Common/Utils.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "bdfa4ff02089c98546d5301a2ec7b14a1a3a5452391ebd9351f6beea31d7cd25"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/AchievementCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "cc5e4efe2dab81f1f64b607f4b26c77dec48894afff5981cb2623caef1cdc63c"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/ArtifactCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "a6ee4413fd050b221f53e5671d35214d9c5cef596cf62301bb915c0c8f189ba1"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/BaseCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "c2ff08398dfff95a47bb5fb8271f1c816f98aeaf1341612ecc17d018b4926618"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/CharacterCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "a6698885c73b269b5ab69ce19cb1f7476dafdde62faa23a4dbc872880cdf2e35"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/IAchievementCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "04eb3c81dd32346d9917d3bc7e363bb1312ea19bbdbc73be6c05ebc5c505f00e"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/IArtifactCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "2723945bd829930e7b79e7a06649e5ff248a3b6b2912050347a5a533d3660b4b"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/ICharacterCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "45e4e6b73ff1c43491deccd25262763ddb324e7266ed66974ef23992acef265d"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/IDataCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "2d56e82b31e5a74588e933c5879dc392570712b9f106afa9b4347e3f82a7e68d"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/IInventoryCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "7d9d1eae98f018265557ae16467adc8dcbb98fbadaec1838da44658aed137803"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/IWeaponCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "27e66ea6e862489304c43668a376480372246f5f5f1c110802d0b6fe8ebfbbb9"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/WeaponCollection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "29d45b7de3e928e79d16519b2afdbbfa0ea663117e565fbde69546f7c3112cc5"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataFiles/DataFile.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "9fd7b6fc7dd7f6c1101cc7dc4f95bb758dce32a2e92afdf1d9646b2ce56290fd"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataFiles/DataFileRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "eea2c671bfbd21830d06576972daf057d554432705474d3a8065b88d69a7c42f"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataFiles/IDataFile.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "9a91ed693042a541c8818fbcc9930e7e321af29248f33257ec5d134e9cf47713"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataFiles/IDataFileRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1188dd57df7123835c298b230ce657e662891d27fff2ae7c71ff84bd557a9de6"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Exporters/GoodExporter.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f9fd8e84b6ad4be9de191f5a06e738f809ba6b6c254e0c59c330dc44cb76b140"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Exporters/PaimonMoeExporter.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "a5fa1ecb26530334f1cda25f84fe4c0fd1dff34ecc05064fdc601631079ddcb8"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Exporters/SeelieMeExporter.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "5c67e155807f532f242ed361ea522b49798a9a2de31fbc339837a0b6313e25b7"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Importers/IPaimonMoeImporter.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f1da9b6135d2faf0c6d045e484f89de77982993cdfadb0e530193be115576192"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Importers/PaimonMoeImporter.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "7728085420b0630483ec014412f50607beebc3fb7b28fc1092f4648c9d4c72ad"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/ProcessControl/GenshinProcessControl.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "463c084e5a4625c40e2fa684ec3bbc910358a35349bfe222d0faf19f35cd723a"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/ProcessControl/IProcessControl.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "d055a7af26659effb69853704b0d025fb7bda09fcc9254be8eb225bcde4acff9"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/ResultHandler/IResultHandler.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "d481283118595ddd8ade1eed5316356716b64f84e64ecf33e7f14f9e1f3ef252"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/ResultHandler/ListResultHandler.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "d9eb0e2d9d7b3ff30da80d659ba68b79ccdefecf0ff0a26dcfe9b0c00550b726"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Scrappers/BaseInventoryScrapper.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "c2d2c5d648202c0930daf64ca9ac38e2ad79f2c467dd6e25d0e5f4877faffb97"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Scrappers/BaseScrapper.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "76d982a87b3144679c0e9f4e44db9fb61a38757fe730e689e8fddee90cd089f1"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Scrappers/EquipableScrapper.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "08d28a9997998b953fa56b5af449ad86c6f58570f788e2629d918873546d0c06"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Scrappers/IScrapper.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "efb1c75587e5a59aef0b79fb1010b899b1671528931a0e0446eeb1638a452158"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/ScrapPlans/BaseScrapPlanManager.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1f462b83f3fc793021ee79ab92d28a75c7bffec7421f69f1f93dffdda0d624c4"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/ScrapPlans/IScrapPlan.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "8d39a6bec93517f680aaa24ef66e0b6e1fa9065bd4818e22dcbe71e0f48340e3"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/ScrapPlans/IScrapPlanManager.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "ad3743ed0127dccc70c4453e1c4b4923a67b2072aeccf01c09b99c89ed948889"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/ScrapPlans/ScrapResult.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "d04985624a7bd2e288854ffb967e9334777c31d5f68d7174bf32716016e78258"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Screenshot/IScreenshotProvider.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "dcc119637457b40f862ea95087ae2003eb30c965a3a5f1b69531157279986ac3"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Screenshot/ScreenshotProvider.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "4e250a336a5a042b4ce95d66849b92cff52ad77dfed769027878f208cc0d65c2"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Suspender/ISuspender.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "47219c00c164a6009fde5bb9ed5463594d6990cfec7284d804dde3f2a7274c05"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Suspender/RandomSuspender.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "870ac18e1f6ea652c07a0a58441ddf21a3b1176cfbf2c68c156b0e443ceeb1cb"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/TextRecognition/ITextRecognitionService.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "e304b80291a6d4e739c524964e64e2b1ece6b660e013322bbbea8e6a8d780973"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/TextRecognition/TemplateMatchingService.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "6b068d584ceb0f192606e618b7d109540140fe9d486c8bda780804ba3463cb2b"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/TextRecognition/TesseractService.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f355a6cbb6341f021ff86eadd0fb66c30f854927e1eeb8e35ee0a824ee7db353"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Weapons/WeaponDataFileRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "2fdc1ef48732a1c6c48043ef6959de15b2347da9ba5505dacb9f0d7f6b359553"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Weapons/WeaponResultHandler.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "fe0981d58e123a673f54de35451877142b3504c1bce1fa9510b18ff254d219b8"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Weapons/WeaponScrapper.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "d1aad0234d2bd8c35bbca91026f2db23f6b8577713e90088b82fc14855034efe"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Weapons/WeaponScrapPlan.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "ff04a9eb184dbd21f98dd3c9a624439e1e0d80f1be4cc8b59eae798ca2719f41"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Configs/Config.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "d849ef57fa554873dda8858147dfcb1c2d8e029a0a193c20ac67343f5299a277"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Configs/IAchievementConfig.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "a600f0a798ee3d15e53e93ed19c1a70f3874128095b146e335cf2957bb6f6df5"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Configs/IArtifactConfig.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "edc4697d4a5aef916ed4b81ea0dec3de80870c30d6861a00bb47d83e820244c5"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Configs/IBaseScrapConfig.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "2cea698708eeb1dacab761cb5b4196a7f0d3e1fb2591e867c4409efef85ba330"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Configs/ICharacterConfig.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "dbee66c5dd76bbb9f812fb6f76b56051656ac7cee8850667e5bda7c4b10ca3e5"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Configs/ICharacterNamesConfig.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "bc6a561658c67e3405255df7cba60a69bc5dfff4890b90145eb8002500b97d97"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Configs/IConfig.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "9d06b434fc71de0c3c50064f1a621487fc407aad722986a519e84d99fd1d707b"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Configs/IGlobalConfig.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "52ffb3b396263e5465fe3bfd06cbe8fbed29887228e99677f6e3c16332641970"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Configs/ITravelerNameConfig.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "8fde34d9f36db2e76d074ae7ee917426af156ee1e3690da240d7c1c9aae9dd3a"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Configs/IWeaponConfig.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "8eabf76f968aae724b80782e2ae03ef9673e5ca2429c13e29fea78d48049c864"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Data/Achievement.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "b9fcf901cae98d31ccff6f1fe87e7bbe2c583b7f26b01b45e1823d1a3e9c5944"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Data/Artifact.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "2f8cabaeec147233fdc89ef143cda4478ef6f58f07f3a32e8f7b88b408f62f56"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Data/ArtifactSlot.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "16b193b1ddcda2bd699f80b914e3752cf231398463d4cc54687ba12f6c973904"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Data/ArtifactStatType.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "c1af13856c2cd4ce5acce0152425fabd9cbde7f3a5461fcfb96099706db8883b"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Data/Character.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "4a60ec092aa1fa264aea0d58e9d36d40a54457671f4d432315a38d2a919c82bc"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Data/Element.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "20675b4b858886f1d97421b8be33e05d38f7d71b945e65b3d92f22d17b4a6861"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Data/TalentType.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "d2fdf438ff0b840d3a12b63e822028001eceaa91da58e47de452e30efe46ec8d"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Data/Weapon.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "fbbba05914410284d1d16001247a9a5f73b7f7c862140009c175013a9ebf7b1c"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Data/WeaponType.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "63068abad5246c50cb31195f9fc545f8aa7bba51ecfd435512753a4672501cc5"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Entries/AchievementCategoryEntry.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "c847e27d42586f6ecefc79fb00d831ecc2e6df6e5518e33ab2e359b790347c5c"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Entries/AchievementEntry.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "917f67d79c335873f78226d8ef15892213bcb04c478e4892fcab5b05db23c2c2"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Entries/ArtifactEntry.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "33a56a7bbe82932ae2b3f9388999317e97c8f8cde39f0e912b9e21b63d367913"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Entries/CharacterEntry.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f01e1d1ba953cdccd19d172eb196e3ecf4fabfbb6d48c6648f35efa69d8ff415"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Entries/Entry.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "e8364ee0fead686c30db700cb3fb793eb256de54440ea322d4256b7ca579f50b"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/BaseTypes/Entries/WeaponEntry.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "9ac9436299e1f1898a98e7fbfe7a0c7429621807465751386c4c1bb96a0db921"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/Repositories/AchievementRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "cd3551b8cb5413a9d63483a1a3e51a4675a4692f0dee51c8347a1dd52673cca6"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/Repositories/ArtifactsHoYoWikiRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "0a6365464dbf48f01f1f0691d2c511697892312a58e2bc63db46b3eda17dffe6"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/Repositories/CharactersHoYoWikiRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "6180d65278b4035b6dc99063b5c0b75ac6aac90074257def1150a713aad6e33f"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/Repositories/HoYoWikiRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "89a41c517a50131e4f2f85243e9885e0aa90a80ddd2c05f2570ab69c52e7e34b"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/Repositories/IconRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "25bfd909b773c8e1f45511fc77fb5e74c93869d88e80da6e74330082c31f73d7"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/Repositories/IRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "5c2c2570bedbf9cb42f9bdafdb3e87a33f648738105fc6f3861c1a1fd4d690df"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/DataCollections/Repositories/WeaponsHoYoWikiRepository.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1e5b7d44687bb6bc6f73e74b53d62c5d1b8279f0d9302aa83d89fda4077e646b"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Dtos/Character/CharacterEntryDto.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f98e891a39ec3e10234370ead2da65e9b4b34f9952c08bd60ee4f8b7211aa116"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Navigation/Achievement/GenshinAchievementNavigation.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "86cd2db641e6d32b6927bc92ef9430fad23d239453566b65b5f735751a636879"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Navigation/Achievement/IAchievementNavigation.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "a33f4c408d441223b0235634e31e44e8825c61365684afac6506a8f653232601"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Navigation/Character/GenshinCharacterNavigation.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "0ff9aa1cddefd4a4ddb55d70e4892ed57333aad89e2c82aa7b557ced409934fc"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Navigation/Character/ICharacterNavigation.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1d1d35765d77aa4dbd349938c1d7ab40fbe8c821e940fc018bb1c4be0db82121"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Navigation/Inventory/GenshinInventoryNavigation.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "8915ab9a898676df3f2952957cf60d00f3b1b0e15e6dba6f3f1e164b5e520556"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Navigation/Inventory/IInventoryNavigation.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "19c47ad1d6d7e39e26b1ba31ceefb823c9e95e9edfd5aa5f40e2190bdeb1d9a9"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Navigation/Keyboard/IKeyboardService.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "ccb55c8dfeba82e367426f85491d6379cee10e66ca50cbbef37edffb5cc4adc6"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Navigation/Keyboard/WindowsKeyboardService.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "4b46b873363e75d353e121d4ef3ac74ab22142e32e48e7383b42700d8152c316"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Navigation/Mouse/IMouseService.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "686ab9e97e88c44e0ffe5713cb25a47c6e46c5ae0c98e4ea758d92ea475fe585"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Core/Navigation/Mouse/WindowsMouseService.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "4c3dc4c51b0529dd3692562140920ae31958ef4615a4122e29bef815959847cd"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Resources/tessdata/genshin_eng.traineddata",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "e38c714d8c3c37f8afdbc84edcb04d219d0870341a115780368f6b0a4ff1baf0"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Actions/SetDataCollectionStatusAction.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "84a6d74e41b9c14b883527b27167186993b3fea7249d0b7079a0d9425549d590"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Actions/SetProcessStateAction.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "ba0aabfb684e1c92d788cd98a7212a519eb4933703c83422d098cafec6b5922c"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/AchievementItem.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "ea5382be2922c2eb0ef03ef46278cc27537a6063c83d45488999e913665b3cc3"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/AchievementItem.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "5629de963f94883b8a8626687535cccdcfe3ba0fa398ad76ce094ffef9503ef4"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Collapsible.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "3b0c1f57f8f725380dff10edf618ea5ee1136ab0fe8ef242e380b6ac5b82f172"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Collapsible.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "225ca607eeac07ba60b9e9fdc0cf0330d6b1192a49b46ff366e460fda2f6cacb"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Field.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "c985edc9a5b7ef0505441fd98acebfdb8547ae4fa2f485499f21117f460d3158"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Field.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1cbf400c24200522ae9c42f413b9f68dd2520cb70a9da46b79eedb8f6ac559fa"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Form.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "7169612ed23bde895367f45a1b5eb6e9161af9c8a2c228809f16b74c6fd31fd3"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Form.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "4d3bf86467391202897da84f745a17103b71ee3b709b5d32c2022055f2d8121e"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/FullScreenModal.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "451700eaacc6937937b78fe7e6a6c7d4e21222e0e0240fdb616dc5ad7a307646"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/FullScreenModal.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "89867cab3c7170c1b179a0a5da93e2e34216206805846e962d95c6d93d10bed5"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/ListSelect.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "3c3f6ca962f378a92ccc260b4644d5705f9f038e29636388fd44f2df67778ef7"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/ListSelect.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "7bae932b3ccee2e083d95f5b4cc06aaa27e018b46e8bd4a3be569705c508cba9"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Loading.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "dfd3254d9326d79db1624d999cef2651239aa50d618f8416e8d4db48a399695a"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Loading.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "4daa3ee08262656ff6dadf200cd20171bbacd7b6f9af98eb0c8c56998c918e7b"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Modal.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f44b4c18e5f27384064c7527b85fde2e68a4aa995064fa2d0292e063f05a5cd8"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Modal.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "057a528ba03e191796db507bcc5a292d9cc1c619a6e162e20c782b3bc9ca2a3c"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/NavGroup.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "cf2cbe8ee0de37aa33d9b9bd3c178fa105559e21f0fd0dd786d61614f60ee487"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/NavGroup.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "926a04f8caa39ff2fa708e09d4031981aaeb3051db3a2ca943d4f1490b30fbdb"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/NavItem.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "53c302c2a5ddc77847e6503c82664728f5698403d1a4a69a33503ee4bf874e7e"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/NavItem.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "62ef7b6e5565b22f5d653c1e9d1519ee5119082f43b0b35e85bbf415957c5b25"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Section.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "01f247daf59c057cafe0b25bfbe378757682f14e308e742c231bf0e1bd3edc50"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Components/Section.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "6920b31179b8132a34769279ad4baab6acea50f5d17e14238a4678477353d20a"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Flux/Dispatcher.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1b276e4120a907a81bdbf6e78f0323f839b0eeaf0b5fc6684cba29fdc2186afa"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Flux/Flux.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "8817f8c0e6f2ae1b8365e76e96ce7bd8a0f36b1ade5e20276f29df262abda1ac"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Flux/IAction.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "ae87cbb3c4c34f23c046fb17d3a17baa2adda0abf594859ebb82529c979ad3d2"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Flux/Projection.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "03e3c0579ba6b98dada3f0a081e7e724dc0b0747c5393a5f45a76025e62569f9"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Layouts/MainLayout.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "a52d2afd22bbc15c13ecd1f217c45e96a19b0761330b813994c49b1965df41a1"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Layouts/MainLayout.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "b217a09648043846633a333a75e11f456954b38bb42ab2f2a36eedc6414c76a3"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Home.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "60d5363b5a412cb3a75f777db0d22243e59d9b7b991f2ab5b855500cca8b6d20"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Home.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "2ad3f3c1a901a78454f7caea4ec6fd525cf56fce31704b26bc2b75d289f89cfa"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Index.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "ae81f17c260f5f62998bdf2ab34f6e918e413f1693fbd1a57b10bbd307038a87"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Settings.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "6b8ebeed83e98d7f39b893f363c98c83454123679a0e8626d586ca321d825542"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Settings.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "10f11bce5ec2d28ecc521c2fb4d63e2b6ea96a33a41246ea9841924cf3caea36"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/AchievementEditor.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "96d6d05d633596cbe9f74639f35873528989820029d82133ecf8de03cee86215"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/AchievementEditor.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f1945cd6c19e56b3c1c78943ef5ec18116907a4ca1efc40a57d48ab1db7adfc5"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/DataFileList.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "6dd710e7a4a25f84bae6dd12d2d726ba12db05bd7a89d515795a2743a82072ff"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/DataFileList.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "c19b0a95bd03e8fc53a0bd4b089c02334c10e418018db02508383ee8ded8856e"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/DataFileListOptional.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "16d7eab3ce00b7a8d3a1faddc1494a86cda45437ded90f7ffff42c7ee16b844f"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/DataFileListOptional.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "f20408f2fd44264ea39135b2bcd20e6bd758c70c848e8eb186c66330dd8b4366"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/DataUpdate.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "035b8c4ffddfc5c3f7907b82b0860dd254046cd5b9506ca22a4910df2b0de9a8"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/DataUpdate.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "aa5bd780bc86973cf923029e1f711cab668ad6f90bf8579f9140db2e88eddccc"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/DataUpdateSection.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "4b81ffd48101dbc436cea3f56d5ba1824477c17e17b0c466a72e2a3048f72788"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/DataUpdateSection.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "01c8a866b8b1b59de79ee50caf1fa7de5f6ff91d8a452ccd80b8e10a8ad26317"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/ExportLayout.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "a1f818b7a9e0cce72804ea79bd24d7563855bf0654590863c695f37d6df6dd41"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/ExportLayout.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "72d5b715b51393226831f1eaf5c10150964ef3e5d03bd3e513516e41a73ed898"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/NavMenu.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1b31c95991329ad08b284bccb3a49a7e7d7578e74b820129fc5802617815143a"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/NavMenu.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "eee34e3113992783a87161486d5f517e41bf9e9486897a11cd758ae4a3a65f37"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/ProcessStatusDisplay.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "522a925a1d80ee09b8d5062631262bb834dafb21127310c8d874c3fa810e85b0"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/ProcessStatusDisplay.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "185d2b4e737dcd62cda9c9ca79dfb49abc524bc067a0228052375a5bc462908b"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/Scanner.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "66c2638dcbeacfee4c0e3e13dede735667a1e8b3b39248cd0f06a090754262e4"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Partials/Scanner.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1787a5080211778210a96b209fae4f8b6e3dfd768c942a3e76ef2a9f54ff4ea5"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Stores/DataCollectionStatus.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "c5fcd32daf21a780548df3e349cf4ddcb1be94f25357a3fc0f3d5755950b8eb5"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Stores/ProcessStatus.cs",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "879de72214c14fa3bd06e7e20c19ff138c5c9146c19f66d87e9a2b526fd5f261"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Exports/GoodExports.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "18b22e7582c4a5b912ba06dec9a011c73ef02fcc637cec7075be8ea019d0016b"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Exports/PaimonMoeExports.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "d8bdcb708b9a7ceb81dcb420483909d3a4e9a83d00fa4f8616756f857eb7e718"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Exports/PaimonMoeExports.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "38d9e1caf2b45bd765edae34f5b4b37a923071afe5ca28cfaf2d729cea3467e7"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Exports/SeelieMeExports.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "24b5c7841a5b24fe3c48c63abe78e1ada5a12d306619550449b35024ddfca256"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Exports/SeelieMeExports.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "38d9e1caf2b45bd765edae34f5b4b37a923071afe5ca28cfaf2d729cea3467e7"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Scanners/AchievementScanner.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "8d69dffb238e5f63b1b4c687fec6af92e270af0bd2d63eabc2dc6abedd0c8132"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Scanners/AchievementScanner.razor.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "6d186216fe3033563e03e2cafdfaf891db7b0a9a0e87f30e604d3dc6b8422e91"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Scanners/ArtifactScanner.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "874d8a0ff6a277d7d16a8a675ee14b0a380e1b377044217171e1a26dda370980"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Scanners/CharacterScanner.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "d7b75a9917c93c0951a91f36c61bf2efb640eec625e1d9df158ad61399fab2f2"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/Ui/Pages/Scanners/WeaponScanner.razor",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "149b18db677dc0d15acf4f8c21113cc98d96028d5b433a748e75e75bd589d3ce"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/wwwroot/css/app.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "79e7a494fce6f492a7efc5a26ddb52991cb885915faa194aac95b7bff0ba7eb1"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/wwwroot/css/reset.css",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "35c85b351748821873867f072e499f26026a4887bdca4b7115a783aa74da07cd"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/wwwroot/js/get-input-value.js",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "a12b2d4c1aa4075a4bf3af98ab0917effe370a2600ef135032a893e1163e84f2"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/wwwroot/js/save-as.js",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "1eff301fd64fa00e932a834c0f0e2c8a77801518b7c4bae22f59e427b6d74780"
+  },
+  {
+    "path": "third_party/akasha-scanner/AkashaScanner/wwwroot/js/scroll-to-top.js",
+    "origin": "akrios-d/AkashaScanner@v0.6.4+diagnostics",
+    "sha256": "a24164889776bb83ba353aca32b0b535ae115628b10c33919406ece906679d88"
+  },
+  {
+    "path": "docs/ARCHITECTURE.ko.md",
+    "origin": "catheryne-design",
+    "sha256": "74b8365867cab620378d7d328a81cb913d63353927590aa669fedfc4cbb93c6a"
+  }
+]
