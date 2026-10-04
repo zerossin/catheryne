@@ -106,6 +106,7 @@ external 'CloseHandle@kernel32.dll stdcall';
 procedure StopDaily;
 var Handle: THandle;
 begin
+  if not IsCatheryne then exit;
   Handle := OpenEvent($0002, False, 'Local\Catheryne.Daily.Stop');
   if Handle <> 0 then begin SetEvent(Handle); CloseHandle(Handle); end;
 end;

@@ -241,11 +241,18 @@ internal static class ServiceTests {
  static void CheckLaunchPurpose(){
   string root=Path.Combine(Path.GetTempPath(),"catheryne-launch-purpose-"+Guid.NewGuid().ToString("N"));Directory.CreateDirectory(root);
   try{
-   AppPreferences.Set("gameExecution","isolated",root);
    string file=GameEnvironment.Endpoint(root,WindowsChildSession.Current),failed=CatheryneTools.Json().Serialize(new{state="failed",failure_kind="authentication",host_started=DateTime.UtcNow.Ticks,error="fixture authentication failure"});
    Directory.CreateDirectory(Path.GetDirectoryName(file));AtomicFile.Write(file,failed);
    var installation=new Installation{Data=root,Engine=Path.Combine(root,"missing-engine.exe")};
    var config=new System.Collections.Generic.Dictionary<string,object>{{"GamePath",Path.Combine(root,"missing-game.exe")}};
+   Assert(!GameEnvironment.Selected(root),"new settings default to ordinary desktop execution");
+   foreach(var purpose in new[]{GameLaunchPurpose.Player,GameLaunchPurpose.Automation}){
+    bool normal=false;try{LauncherOperations.Start(installation,config,false,purpose);}
+    catch(FileNotFoundException){normal=true;}
+    catch(InvalidOperationException error){if(error.Message!="게임 또는 언락커가 이미 실행 중입니다.")throw;normal=true;}
+    Assert(normal&&File.ReadAllText(file)==failed,"default player and AI launches stay local despite stale child-session authentication errors");
+   }
+   AppPreferences.Set("gameExecution","isolated",root);
    bool local=false;try{LauncherOperations.Start(installation,config,false,GameLaunchPurpose.Player);}
    catch(FileNotFoundException){local=true;}
    catch(InvalidOperationException error){if(error.Message!="게임 또는 언락커가 이미 실행 중입니다.")throw;local=true;}

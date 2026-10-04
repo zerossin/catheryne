@@ -22,7 +22,7 @@ internal static class GameEnvironment {
  static readonly System.Collections.Concurrent.ConcurrentDictionary<int,Tuple<long,string>> processImages=new System.Collections.Concurrent.ConcurrentDictionary<int,Tuple<long,string>>();
  static int workerSession=-1;
  internal static bool IsWorker {get{return workerSession>=0;}}
- // Activation is explicit until the complete background workflow is validated and exposed in settings.
+ // Ordinary desktop execution is the default; child-session execution requires an explicit advanced preference.
  internal static bool Selected(string root){return CodexChat.S(AppPreferences.Read(root),"gameExecution")=="isolated";}
  internal static bool InSession(string root){
   if(IsWorker){if(WindowsChildSession.Current!=workerSession)throw new InvalidOperationException("게임 실행 세션이 변경되었습니다.");return true;}
