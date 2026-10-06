@@ -42,8 +42,7 @@ jobs:
       - name: Fake-input core regression tests
         working-directory: core/story-control
         run: |
-          $env:PYTHONPATH='src'
-          python -m unittest discover -s tests
+          & ../../apps/desktop/runtime-build/python.exe -c 'import sys,unittest; sys.path.insert(0,"src"); suite=unittest.defaultTestLoader.discover("tests"); result=unittest.TextTestRunner().run(suite); sys.exit(not result.wasSuccessful())'
           if($LASTEXITCODE){throw 'Core tests failed'}
           node --test integrations/sky/bridge.test.mjs
           if($LASTEXITCODE){throw 'Bridge tests failed'}
