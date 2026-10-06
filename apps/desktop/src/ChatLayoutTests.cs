@@ -28,19 +28,22 @@ internal static class ChatLayoutTests {
   var between=window.PointToScreen(new Point(500,20));Check(SendMessage(hwnd,0x84,IntPtr.Zero,Packed(between)).ToInt32()==2,"unused header retains native dragging and double-click hit testing");
  }
  internal static void Run(Window window,WorkspaceHome workspace){
-  var menu=(Border)window.FindName("WorkspaceMenu");var chat=(Border)window.FindName("WorkspaceHome");double width=window.Width;
-  Action<double> margin=left=>{window.UpdateLayout();var expected=new Thickness(left,LauncherWindowLayout.ChatTop,18,84);Check((Thickness)chat.GetAnimationBaseValue(FrameworkElement.MarginProperty)==expected&&chat.Margin==expected,"transcript and composer reservation: expected "+expected+", base "+chat.GetAnimationBaseValue(FrameworkElement.MarginProperty)+", current "+chat.Margin);};
+  var menu=(Border)window.FindName("WorkspaceMenu");var chat=(Border)window.FindName("WorkspaceHome");double width=window.Width,minWidth=window.MinWidth;
+  // The hosted runner can have a smaller desktop than the wide-layout fixture.
+  // Set the fixture minimum too so native restore cannot clamp its requested viewport.
+  Action<double> resize=value=>{window.MinWidth=value;window.Width=value;Wait(300);Check(Math.Abs(window.ActualWidth-value)<1,"fixture viewport: expected "+value+", actual "+window.ActualWidth);};
+  Action<double> margin=left=>{window.UpdateLayout();var expected=new Thickness(left,LauncherWindowLayout.ChatTop,18,84);Check((Thickness)chat.GetAnimationBaseValue(FrameworkElement.MarginProperty)==expected&&chat.Margin==expected,"transcript and composer reservation: expected "+expected+", base "+chat.GetAnimationBaseValue(FrameworkElement.MarginProperty)+", current "+chat.Margin+", viewport "+window.ActualWidth+", state "+window.WindowState);};
   try{
-   window.Width=1240;workspace.Show("설정");Wait(300);margin(258);Caption(window);Wait(300);margin(258);
+   resize(1240);workspace.Show("설정");Wait(300);margin(258);Caption(window);Wait(300);margin(258);
    Check(chat.TranslatePoint(new Point(),window).X>=menu.TranslatePoint(new Point(menu.ActualWidth,0),window).X,"wide chat must remain to the right of the menu: chat "+chat.TranslatePoint(new Point(),window).X+", menu right "+menu.TranslatePoint(new Point(menu.ActualWidth,0),window).X+", menu width "+menu.ActualWidth+", visibility "+chat.Visibility+", window "+window.ActualWidth);
    DrawerMotion.Hide(menu);Wait(20);workspace.EnsureMenu("설정");Wait(300);Check(DrawerMotion.IsOpen(menu),"reopening the same menu must cancel its pending close");margin(258);
    // Recomputed geometry must be recoverable even when the requested destination did not change.
    chat.BeginAnimation(FrameworkElement.MarginProperty,null);chat.Margin=new Thickness(18,LauncherWindowLayout.ChatTop,18,84);workspace.EnsureMenu("설정");Wait(300);margin(258);
    foreach(string route in new[]{"플레이","내 계정","캘린더","설정"}){workspace.HideMenu();workspace.Show(route);Wait(15);}Wait(300);margin(258);
-   window.Width=980;Wait(300);margin(18);Caption(window);Check(DrawerMotion.IsOpen(menu),"narrow layout must retain the overlay menu");
-   window.Width=1240;Wait(300);margin(258);
+   resize(980);margin(18);Caption(window);Check(DrawerMotion.IsOpen(menu),"narrow layout must retain the overlay menu");
+   resize(1240);margin(258);
    var feature=(Border)window.FindName("CompanionPage");DrawerMotion.Show(feature);Wait(250);Check(chat.Visibility==Visibility.Collapsed,"a detail panel must keep covering chat");DrawerMotion.Hide(feature);Wait(250);Check(chat.Visibility==Visibility.Visible,"chat must return after the detail panel closes");margin(258);
    workspace.HideMenu();Wait(300);margin(18);
-  }finally{workspace.HideMenu();window.Width=width;Wait(300);}
+  }finally{workspace.HideMenu();window.MinWidth=minWidth;window.Width=width;Wait(300);}
  }
 }
