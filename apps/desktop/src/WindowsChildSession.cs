@@ -173,15 +173,25 @@ internal sealed class ChildSessionView:Forms.AxHost {
   WindowsChildSession.Set(advanced,"EnableAutoReconnect",true);WindowsChildSession.Set(advanced,"MaxReconnectAttempts",ReconnectAttempts);
   // Do not forward host drives, printers, devices or the clipboard into the game session.
   WindowsChildSession.Set(advanced,"RedirectDrives",false);WindowsChildSession.Set(advanced,"RedirectPrinters",false);WindowsChildSession.Set(advanced,"RedirectPorts",false);WindowsChildSession.Set(advanced,"RedirectClipboard",false);
-  object enabled=true;var extended=(ExtendedSettings)client;
-  extended.SetProperty("ConnectToChildSession",ref enabled);
-  if(!Equals(extended.GetProperty("ConnectToChildSession"),true))throw new InvalidOperationException(Locale.T("Windows 분리 연결을 설정하지 못했습니다."));
+  var extended=(ExtendedSettings)client;
+  SetExtendedFlag(extended,"ConnectToChildSession",Locale.T("Windows 분리 연결을 설정하지 못했습니다."));
   // Remote pointer-position updates must never warp the user's desktop cursor.
-  extended.SetProperty("IgnoreServerGeneratedMouseMoves",ref enabled);
-  if(!Equals(extended.GetProperty("IgnoreServerGeneratedMouseMoves"),true))throw new InvalidOperationException(Locale.T("게임 입력 격리를 설정하지 못했습니다."));
-  // Current supported Windows clients expose native relative game-camera input.
-  try{extended.SetProperty("AllowRelativeMouseMode",ref enabled);}catch(COMException error){if(error.ErrorCode!=unchecked((int)0x80070057)&&error.ErrorCode!=unchecked((int)0x80020003))throw;}
+  SetExtendedFlag(extended,"IgnoreServerGeneratedMouseMoves",Locale.T("게임 입력 격리를 설정하지 못했습니다."));
+  // Microsoft introduced this optional property in the 24H2 RDP client (build 26100).
+  // Older clients return E_UNEXPECTED for unknown properties; do not call them.
+  if(SupportsRelativeMouse(ClientVersion))SetExtendedFlag(extended,"AllowRelativeMouseMode",Locale.T("게임 입력 격리를 설정하지 못했습니다."));
   Record("configured");
+ }
+ internal static Version ClientVersion {get{
+  var info=FileVersionInfo.GetVersionInfo(Path.Combine(Environment.SystemDirectory,"mstscax.dll"));
+  return new Version(info.FileMajorPart,info.FileMinorPart,info.FileBuildPart,info.FilePrivatePart);
+ }}
+ internal static bool SupportsRelativeMouse(Version clientVersion){return clientVersion>=new Version(10,0,26100,0);}
+ static void SetExtendedFlag(ExtendedSettings extended,string name,string failureMessage){
+  try{
+   object enabled=true;extended.SetProperty(name,ref enabled);
+   if(!Equals(extended.GetProperty(name),true))throw new InvalidOperationException(failureMessage);
+  }catch(COMException error){throw new COMException("Windows RDP setting failed: "+name+" (0x"+error.ErrorCode.ToString("X8")+")",error.ErrorCode);}
  }
  internal void Connect(int width,int height,bool interactiveAuthentication=false){
   if(Connection!=0)return;

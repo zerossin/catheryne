@@ -70,6 +70,8 @@ internal static class ServiceTests {
  static void CheckConnectionConfiguration(){
   Assert(!string.IsNullOrWhiteSpace(ChildSessionView.DisconnectMessage(2055,null)),"authentication failure remains actionable when Windows returns no error description");
   Assert(ChildSessionView.DisconnectMessage(1028,"Socket failure")=="Socket failure"&&!string.IsNullOrWhiteSpace(ChildSessionView.DisconnectMessage(1028," ")),"connection errors preserve Windows detail and have a nonempty fallback");
+  Assert(!ChildSessionView.SupportsRelativeMouse(new Version(10,0,19045,0))&&!ChildSessionView.SupportsRelativeMouse(new Version(10,0,20348,0))&&!ChildSessionView.SupportsRelativeMouse(new Version(10,0,26099,9999)),"Windows 10, Server 2022 and pre-24H2 RDP clients never receive the unsupported relative mouse setting");
+  Assert(ChildSessionView.SupportsRelativeMouse(new Version(10,0,26100,0))&&ChildSessionView.SupportsRelativeMouse(new Version(10,0,26200,0)),"relative mouse configuration starts at the actual RDP client 24H2 version and supports later clients");
   // Exercise the actual COM property ABI without connecting or prompting for credentials.
   using(var form=new System.Windows.Forms.Form())using(var view=new ChildSessionView()){
    ((System.ComponentModel.ISupportInitialize)view).BeginInit();form.Controls.Add(view);((System.ComponentModel.ISupportInitialize)view).EndInit();
@@ -81,6 +83,18 @@ internal static class ServiceTests {
    Assert(configured==3&&view.Connection==0,"credential prompting and the Windows remember choice are explicit and reset for an automatic attempt");
    var client=typeof(System.Windows.Forms.AxHost).GetMethod("GetOcx").Invoke(view,null);var advanced=WindowsChildSession.Get(client,"AdvancedSettings7");
    Assert(Convert.ToBoolean(WindowsChildSession.Get(advanced,"EnableAutoReconnect"))&&Convert.ToInt32(WindowsChildSession.Get(advanced,"MaxReconnectAttempts"))==ChildSessionView.ReconnectAttempts,"actual Windows reconnect configuration is enabled and bounded");
+   var extendedType=typeof(ChildSessionView).GetNestedType("ExtendedSettings",System.Reflection.BindingFlags.NonPublic);
+   if(ChildSessionView.SupportsRelativeMouse(ChildSessionView.ClientVersion))Assert(Equals(extendedType.GetMethod("GetProperty").Invoke(client,new object[]{"AllowRelativeMouseMode"}),true),"supported native RDP client actually enables relative mouse input");
+   int nativeError=0;
+   try{extendedType.GetMethod("SetProperty").Invoke(client,new object[]{"CatheryneUnsupportedPropertyProbe",true});}
+   catch(System.Reflection.TargetInvocationException error){nativeError=error.GetBaseException().HResult;}
+   Assert(nativeError!=0,"actual native RDP client rejects an unknown property");
+   try{
+    typeof(ChildSessionView).GetMethod("SetExtendedFlag",System.Reflection.BindingFlags.Static|System.Reflection.BindingFlags.NonPublic).Invoke(null,new object[]{client,"CatheryneUnsupportedPropertyProbe","not applied"});
+    throw new Exception("Unknown native RDP property was accepted");
+   }catch(System.Reflection.TargetInvocationException error){
+    var cause=error.GetBaseException();Assert(cause is System.Runtime.InteropServices.COMException&&cause.HResult==nativeError&&cause.Message.Contains("CatheryneUnsupportedPropertyProbe"),"unsupported native settings remain failures with their exact property and original HRESULT");
+   }
    var eventsType=typeof(ChildSessionView).GetNestedType("SessionEvents",System.Reflection.BindingFlags.NonPublic);
    var events=Activator.CreateInstance(eventsType,System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic,null,new object[]{view},null);
    var traces=new System.Collections.Generic.List<string>();view.Trace=(phase,code)=>traces.Add(phase);

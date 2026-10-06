@@ -67,6 +67,8 @@ Windows 기본 .NET Framework C# 컴파일러로 빌드합니다. 빌드 과정�
     $verifiedHash=(Get-FileHash .\GenshinLauncher.exe -Algorithm SHA256).Hash
     .\package.ps1 -VerifiedBinaryHash $verifiedHash -Repository OWNER/REPO -Compiler PATH/TO/ISCC.exe
 
+Windows 검사는 한국어·영어 전체 자체 검사를 실행하며 실제 RDP 설정도 검사합니다. 선택 기능의 `AllowRelativeMouseMode`는 Microsoft 명세에 따라 RDP 클라이언트 24H2(10.0.26100) 이상에서만 설정합니다. 이전 클라이언트에서는 기존 마우스 경로를 유지하며, 필수 연결·입력 격리 설정 실패는 그대로 오류로 처리합니다. [Microsoft 명세](https://learn.microsoft.com/en-us/windows/win32/termserv/imsrdpextendedsettings-property)를 참고하세요.
+
 package.ps1은 명시된 파일 목록으로 앱·설치 파일과 SHA256SUMS를 같은 날짜별 폴더에 만듭니다. 유지보수한 스캐너를 먼저 빌드·검증해야 하며 패키징은 누락된 스캐너를 거부합니다. 배포 빌드에는 .NET SDK가 필요하지만 사용자는 SDK가 필요 없습니다. 개인 설정·게임 경로·기록·언락커는 제외합니다. 전체 프로젝트 소스 공개에는 검토한 Git 저장소 스냅샷 또는 태그 전체를 사용합니다.
 
 src/Setup.cs는 설치 탐지·초기 설정 데이터, SetupPanel.cs는 런처 내부의 설치 패널, Launcher.cs는 UI·실행 흐름, Services.cs는 설정·업데이트·채널 처리, ServiceTests.cs는 임시 파일 기반 검증입니다. 검증 범위는 신규 설치 해시 확인, 실패 시 미설치 유지, 경로 검증, 설정 필드 보존, 채널 왕복과 버전 보존, 실행 중 변경 차단, 업데이트 실패·백업·다운그레이드 방지입니다. 게임 실행과 각 PC의 탐지는 실제 환경에서 추가 확인이 필요합니다. 120 FPS는 기본값이며 모든 게임 버전에서 오류가 없음을 보장하지 않습니다.

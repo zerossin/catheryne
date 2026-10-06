@@ -28,6 +28,7 @@ function Set-ChildSessionEnabled([bool]$Enabled) {
  }
  if((Get-ChildSessionEnabled) -ne $Enabled){throw 'Windows did not apply the child-session prerequisite.'}
 }
+Write-Output ('RDP client version: '+[Diagnostics.FileVersionInfo]::GetVersionInfo((Join-Path ([Environment]::SystemDirectory) 'mstscax.dll')).FileVersion)
 $prior=Get-ChildSessionEnabled
 Write-Output ('Child-session prerequisite before tests: '+$prior)
 try {
