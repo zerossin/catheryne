@@ -14,7 +14,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/version-v0.2.0-438E7B" alt="Version 0.2.0">
+  <img src="https://img.shields.io/github/v/release/zerossin/catheryne?include_prereleases&amp;label=version&amp;color=438E7B" alt="Latest release">
   <img src="https://img.shields.io/badge/platform-Windows_10%2F11-0078D4" alt="Windows 10/11">
   <img src="https://img.shields.io/badge/status-preview-D5A34A" alt="Preview">
   <img src="https://img.shields.io/badge/language-한국어_%2F_English-64748B" alt="Korean and English support">
