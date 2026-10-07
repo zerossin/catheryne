@@ -420,12 +420,7 @@ internal static class Tests {
    // Raise Loaded without showing a test window or modifying installation data.
    using(var shell=new Launcher(null,false,true,false,false,connectAi:false)) {
     ModEngineTests.LayoutContracts(shell.Window);
-    var shortAction=PanelUi.Button(Locale.T("우선 처리"));var longAction=PanelUi.Button(Locale.T("다시 계획에 포함"));
-    var actionRow=PanelUi.Actions(shortAction,longAction);actionRow.Resources=shell.Window.Resources;
-    actionRow.Measure(new Size(220,double.PositiveInfinity));actionRow.Arrange(new Rect(0,0,220,actionRow.DesiredSize.Height));
-    if(shortAction.TranslatePoint(new Point(),actionRow).Y>=longAction.TranslatePoint(new Point(),actionRow).Y||longAction.ActualWidth<180)throw new Exception("Narrow actions must retain readable labels on separate rows");
-    actionRow.Measure(new Size(600,double.PositiveInfinity));actionRow.Arrange(new Rect(0,0,600,actionRow.DesiredSize.Height));
-    if(Math.Abs(shortAction.TranslatePoint(new Point(),actionRow).Y-longAction.TranslatePoint(new Point(),actionRow).Y)>0.1)throw new Exception("Wide actions must share a row");
+    UiConsistencyTests.Actions(shell.Window);
     var historyButton=((StackPanel)((Button)shell.Window.FindName("Story")).Parent).Children.OfType<Button>().Single(x=>Convert.ToString(x.ToolTip)==Locale.T("AI"));
     ((Button)shell.Window.FindName("Home")).RaiseEvent(new RoutedEventArgs(Button.ClickEvent));
     if(historyButton.Background!=Brushes.Transparent)throw new Exception("Home must not select history navigation");
