@@ -103,10 +103,14 @@ internal sealed class ChildSessionView:Forms.AxHost {
  ConnectionPointCookie events;
  internal string Failure;
  internal string FailureKind;
+ internal int? DisconnectReason;
+ // Current login validity and the completion history of this Connect attempt serve different gates.
  internal bool LoggedIn;
+ internal bool LoginCompleted {get;private set;}
  internal bool Reconnecting;
  internal const int ReconnectAttempts=3;
- internal string LoginError;
+ internal int? LoginErrorCode {get;private set;}
+ internal string LoginError {get{return LoginErrorCode.HasValue?LogonErrorMessage(LoginErrorCode.Value):null;}}
  internal Action<string,int?> Trace;
  void Record(string phase,int? code=null){if(Trace!=null)Trace(phase,code);}
  protected override void CreateSink(){base.CreateSink();events=new ConnectionPointCookie(GetOcx(),new SessionEvents(this),typeof(RdpEvents));}
@@ -127,25 +131,39 @@ internal sealed class ChildSessionView:Forms.AxHost {
   internal SessionEvents(ChildSessionView owner){this.owner=owner;}
   public void OnConnecting(){owner.Record("connecting");}
   public void OnConnected(){owner.Record("connected");}
-  public void OnLoginComplete(){owner.Restored("logged-on");}
-  public void OnDisconnected(int reason){owner.Reconnecting=false;owner.Record("disconnected",reason);string description=null;try{int extended=Convert.ToInt32(WindowsChildSession.Get(owner.GetOcx(),"ExtendedDisconnectReason"));if(extended!=0)owner.Record("disconnect-extended",extended);description=Convert.ToString(WindowsChildSession.Call(owner.GetOcx(),"GetErrorDescription",reason,extended));}catch{}owner.FailureKind=reason==2055?"authentication":"connection";owner.Failure=DisconnectMessage(reason,description);}
-  public void OnFatalError(int error){owner.Reconnecting=false;owner.Record("fatal-error",error);owner.FailureKind="connection";owner.Failure="게임 실행 환경 연결 오류 ("+error+").";}
+  public void OnLoginComplete(){owner.Restored("logged-on",true);}
+  public void OnDisconnected(int reason){owner.DisconnectReason=reason;owner.LoggedIn=false;owner.Reconnecting=false;owner.Record("disconnected",reason);string description=null;try{int extended=Convert.ToInt32(WindowsChildSession.Get(owner.GetOcx(),"ExtendedDisconnectReason"));if(extended!=0)owner.Record("disconnect-extended",extended);description=Convert.ToString(WindowsChildSession.Call(owner.GetOcx(),"GetErrorDescription",reason,extended));}catch{}owner.TerminalFailure(reason==2055?"authentication":"connection",DisconnectMessage(reason,description));}
+  public void OnFatalError(int error){owner.LoggedIn=false;owner.Reconnecting=false;owner.Record("fatal-error",error);owner.TerminalFailure("connection","게임 실행 환경 연결 오류 ("+error+").");}
   public void OnConfirmClose(out bool allowed){allowed=true;}
   public void OnAutoReconnecting(int reason,int attempt,out int decision){
    // The Windows event value 1 stops reconnection. Reuse an authenticated session only; never retry logon.
-   decision=owner.LoggedIn&&owner.Failure==null&&reason!=2055&&attempt>=1&&attempt<=ReconnectAttempts?0:1;owner.Reconnecting=decision==0;
+   decision=owner.LoggedIn&&owner.LoginError==null&&owner.Failure==null&&reason!=2055&&attempt>=1&&attempt<=ReconnectAttempts?0:1;owner.Reconnecting=decision==0;
    owner.Record("reconnecting",reason);owner.Record("reconnect-attempt",attempt);
-   if(decision==1){owner.FailureKind=reason==2055?"authentication":"connection";owner.Failure=DisconnectMessage(reason,null);}
+   if(decision==1)owner.TerminalFailure(reason==2055?"authentication":"connection",DisconnectMessage(reason,null));
   }
-  public void OnAutoReconnected(){owner.Restored("reconnected");}
-  public void OnLogonError(int error){owner.Record("logon-error",error);if(error!=-2)owner.LoginError="게임 실행 환경 로그인 오류 ("+error+").";}
+  public void OnAutoReconnected(){owner.Restored("reconnected",false);}
+  public void OnLogonError(int error){
+   owner.Record("logon-error",error);string message=LogonErrorMessage(error);if(message==null)return;
+   owner.LoginErrorCode=error;owner.LoggedIn=false;owner.Reconnecting=false;
+   if(owner.Failure!=null)owner.TerminalFailure(owner.FailureKind,owner.Failure);
+  }
  }
- void Restored(string phase){
+ internal static string LogonErrorMessage(int code){
+  // OnLogonError also delivers Winlogon progress/arbitration and informational dialogs.
+  // Unknown codes remain visible failures; only documented nonerrors are excluded.
+  if(code==-2||code==-3||code==-4||code==-5||code==3)return null;
+  return Locale.Format("게임 실행 환경 로그인 오류 ({0}).",code);
+ }
+ void TerminalFailure(string kind,string message){FailureKind=LoginError==null?kind:"authentication";Failure=LoginError??message;}
+ void Restored(string phase,bool loginComplete){
+  // Native transport recovery is not a new login acknowledgement and cannot erase a login failure.
+  if(!loginComplete&&(!LoggedIn||LoginError!=null||Failure!=null)){Record("reconnect-not-authenticated");return;}
+  if(loginComplete)LoginCompleted=true;
   try{
    // A completed explicit logon does not authorize another credential prompt on connection recovery.
    var authentication=(ClientAuthentication)GetOcx();authentication.SetAllowPromptingForCredentials(false);
    if(authentication.GetAllowPromptingForCredentials())throw new InvalidOperationException(Locale.T("Windows 인증 방식을 설정하지 못했습니다."));
-   Reconnecting=false;LoggedIn=true;LoginError=null;Failure=null;FailureKind=null;Record(phase);
+   Reconnecting=false;LoggedIn=true;LoginErrorCode=null;Failure=null;FailureKind=null;DisconnectReason=null;Record(phase);
   }catch(Exception error){Reconnecting=false;FailureKind="connection";Failure=error.GetBaseException().Message;Record("reconnect-guard-failed",error.GetBaseException().HResult);}
  }
  internal static string DisconnectMessage(int reason,string description){
@@ -195,7 +213,7 @@ internal sealed class ChildSessionView:Forms.AxHost {
  }
  internal void Connect(int width,int height,bool interactiveAuthentication=false){
   if(Connection!=0)return;
-  Failure=null;FailureKind=null;LoginError=null;LoggedIn=false;Reconnecting=false;
+  Failure=null;FailureKind=null;DisconnectReason=null;LoginErrorCode=null;LoggedIn=false;LoginCompleted=false;Reconnecting=false;
   Configure(width,height,interactiveAuthentication);WindowsChildSession.Call(GetOcx(),"Connect");
  }
  internal void Disconnect(){if(Connection!=0)WindowsChildSession.Call(GetOcx(),"Disconnect");}

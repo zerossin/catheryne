@@ -61,6 +61,12 @@ Microsoft의 현재 Power Automate 자식 세션 안내도 Windows 정책·구�
 
 인증 실패는 같은 Windows 로그온에서만 재시도를 막는다. Windows가 세션 번호를 재사용해도 이전 연결 소유자의 생성 시각이 현재 실제 로그온보다 앞서면 이전 실패를 꺼진 상태로 취급하여 다음 작업의 자동 연결을 허용한다. 시간 정보가 없는 실패는 임의로 지우지 않는다. 이 구분은 새 로그온 뒤의 연결 기회를 복구하는 것이며 Windows 자동 인증 성공을 보장하지 않는다.
 
+`OnLogonError`는 로그인 오류뿐 아니라 진행·조정·정보 알림도 전달한다. 문서화된 `-2`(로그인 진행), `-3`(조용한 종료), `-4`(재연결 선택), `-5`(세션 충돌 선택), `3`(정보 경고)은 로그인 오류로 저장하지 않으며, 연결 종료 여부는 실제 종료 이벤트로 처리한다. 그 밖의 실제 오류와 알 수 없는 코드는 원래 숫자를 보존한다. 진행 알림은 이전 오류를 지우지 않고 `OnLoginComplete`가 오류를 해제한다. `OnAutoReconnected`는 오류 없는 기존 로그인 연결만 복원하며 새 로그인 완료로 취급하지 않는다.
+
+자동 작업의 실제 로그인 오류는 즉시 인증 실패로 표시하고 일반 작업의 재접속을 막는다. 명시적 연결의 초기 자동 인증은 오류를 표시한 채 기존 30초 한도에서 실제 연결 종료를 기다리며, 실제 종료 코드 `2055`에서만 한 번 Windows 인증 창을 허용한다. 그 창에서 인증 중인 사용자는 같은 연결에서 오류를 수정할 수 있고, 설정의 기존 로그인 대기 상태 아래에 오류를 표시한다. 로그인 완료 이력과 현재 인증 상태를 구분하여 완료 후의 인증 오류나 연결 종료가 새 인증 창을 요청하지 못하게 한다. 로그인 오류와 연결 종료·재연결 거부가 어느 순서로 도착해도 인증 실패 분류와 원래 로그인 오류를 보존한다.
+
+2026-10-07 검사에서는 기존 로컬 기록의 자동 연결 종료 `2055`와 성공한 명시 연결의 `logon-error(-2) → logged-on`을 확인했다. 정상 알림을 오류로 오분류하는 기존 코드는 새 회귀 테스트에서 실패했다. 입력·로그인 창 없는 합성 이벤트로 정상/실제/알 수 없는 코드, 오류와 종료 이벤트의 양방향 순서, 늦은 복원 이벤트, 초기 명시 연결의 제한 시간, 인증 대기와 오류 표시를 검사했다. 오류 숫자를 공통 기록에 저장하고 상태 조회에서 현재 언어의 문구를 파생하므로 과거 문구가 새 연결 오류를 덮어쓰지 않는다. 표준 전체 빌드, 프로세스 시작 전 임시 언어 설정을 제공한 한국어·영어 전체 앱 검사, 번역·공개 소스 경계 검사를 통과했다. 두 언어의 좁은·넓은 화면에서 오류와 버튼 배치를 확인했고, 설치본 실행 파일과 영어 번역을 백업·교체한 뒤 해시 일치와 GUI 응답을 확인했다. 이 검사는 Windows 자동 인증 성공이나 실제 인증된 세션의 재연결 성공을 대신하지 않는다.
+
 연결 소유자와 게임 실행기는 공통 통신 대기 함수를 사용한다. 취소는 파이프를 닫아 비동기 완료를 기다리며, 완료 콜백이 사용하는 대기 핸들을 먼저 폐기하지 않는다. 실행기 종료 응답을 기록한 뒤 통신 대기를 취소한다. 초기 연결 실패에서는 확인되지 않은 다른 자식 세션을 종료하지 않는다. 연결 예외의 종류·원래 코드·앱 호출 위치는 개인 내용 없는 공통 지원 진단에 기록하고 연결 저널에도 코드를 남긴다. 실패한 연결 소유자는 정상 종료 코드로 보고하지 않는다.
 
 전체 앱 업데이트는 연결 소유자가 살아 있는 동안 준비된 패키지를 유지한다. GUI와 독립 업데이트 실행기가 같은 잠금 기준으로 검사하며, 업데이트 실행기는 연결 시작과 같은 수명 잠금을 사용해 검사와 설치 사이에 새 연결이 생기는 경쟁을 막는다. 업데이트 중에는 새 실행 환경 시작을 거절한다. 종료는 응답하지 않는 실행기에도 제한 시간을 적용하고 소유한 연결을 종료한다. 연결·복구 단계와 경과 시간은 기존 관측 저장소에 남긴다. 설정은 인증 필요, 인증 대기, 실행기 복구 필요를 구분한다.
@@ -77,6 +83,8 @@ Microsoft의 현재 Power Automate 자식 세션 안내도 Windows 정책·구�
 - [Microsoft 클라이언트 인증 창](https://learn.microsoft.com/en-us/windows/win32/termserv/imsrdpclientnonscriptable4-promptforcredsonclient)
 - [Microsoft Windows 로그인 기억 선택지](https://learn.microsoft.com/en-us/windows/win32/termserv/imsrdpclientnonscriptable4-allowcredentialsaving)
 - [Microsoft 연결 종료 코드](https://learn.microsoft.com/en-us/windows/win32/termserv/imstscaxevents-ondisconnected)
+- [Microsoft 로그인 오류·진행 알림](https://learn.microsoft.com/en-us/windows/win32/termserv/imstscaxevents-onlogonerror)
+- [Microsoft 자동 재연결 완료](https://learn.microsoft.com/en-us/windows/win32/termserv/imstscaxevents-onautoreconnected)
 - [Microsoft 자동 재연결 이벤트](https://learn.microsoft.com/en-us/windows/win32/termserv/-imstscaxevents--onautoreconnecting)
 - [BetterGI 분리 세션 사용 안내](https://www.bettergi.com/feats/command/session.html)
 

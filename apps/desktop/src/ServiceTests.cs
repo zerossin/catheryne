@@ -98,13 +98,34 @@ internal static class ServiceTests {
    var eventsType=typeof(ChildSessionView).GetNestedType("SessionEvents",System.Reflection.BindingFlags.NonPublic);
    var events=Activator.CreateInstance(eventsType,System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic,null,new object[]{view},null);
    var traces=new System.Collections.Generic.List<string>();view.Trace=(phase,code)=>traces.Add(phase);
+   Action<int> logon=code=>eventsType.GetMethod("OnLogonError").Invoke(events,new object[]{code});
+   foreach(int code in new[]{-2,-3,-4,-5,3}){
+    logon(code);Assert(view.LoginError==null&&!view.LoggedIn,"Windows logon progress, arbitration and warnings do not become authentication failures");
+   }
+   foreach(int code in new[]{-1,-6,-7,0,1,2,unchecked((int)0xC000006D),unchecked((int)0xC000006E),unchecked((int)0xC0000224),99}){
+    logon(code);Assert(view.LoginError!=null&&view.LoginError.Contains("("+code+")"),"actual and unknown Windows logon failures retain their original code");
+   }
+   string loginError=view.LoginError;logon(-2);logon(3);
+   Assert(view.LoginError==loginError,"progress and warnings cannot erase an uncompleted authentication failure");
+   eventsType.GetMethod("OnAutoReconnected").Invoke(events,null);
+   Assert(!view.LoggedIn&&view.LoginError==loginError,"transport reconnection alone cannot complete Windows authentication");
    Func<int,int,int> reconnect=(reason,attempt)=>{var args=new object[]{reason,attempt,null};eventsType.GetMethod("OnAutoReconnecting").Invoke(events,args);return Convert.ToInt32(args[2]);};
    Assert(reconnect(1028,1)==1&&!view.Reconnecting&&view.Failure!=null,"an unauthenticated connection does not retry or request credentials");
    eventsType.GetMethod("OnLoginComplete").Invoke(events,null);
-   Assert(view.LoggedIn&&view.Failure==null,"successful logon clears only its prior connection failure");
+   Assert(view.LoggedIn&&view.LoginError==null&&view.Failure==null,"actual login completion clears its prior authentication and connection failures");
+   foreach(int code in new[]{-2,-3,-4,-5,3}){logon(code);Assert(view.LoggedIn&&view.LoginError==null,"informational logon events cannot invalidate a completed login");}
    for(int attempt=1;attempt<=ChildSessionView.ReconnectAttempts;attempt++)Assert(reconnect(1028,attempt)==0&&view.Reconnecting&&view.Failure==null,"a transient loss preserves the authenticated connection during native retry");
    eventsType.GetMethod("OnAutoReconnected").Invoke(events,null);
    Assert(view.LoggedIn&&!view.Reconnecting&&view.Failure==null&&traces.Contains("reconnected"),"native reconnection completion restores the same control and records recovery");
+   logon(0);Assert(!view.LoggedIn&&!view.Reconnecting&&view.LoginError!=null,"a new authentication failure invalidates a previously completed logon");
+   loginError=view.LoginError;
+   Assert(reconnect(1028,1)==1&&!view.Reconnecting,"a login error blocks native reconnection even with a nonauthentication disconnect code");
+   string failure=view.Failure;eventsType.GetMethod("OnAutoReconnected").Invoke(events,null);
+   Assert(!view.LoggedIn&&view.LoginError==loginError&&view.Failure==failure&&view.FailureKind=="authentication"&&failure==loginError,"a late transport recovery cannot erase or reclassify an authentication failure");
+   eventsType.GetMethod("OnDisconnected").Invoke(events,new object[]{1028});
+   Assert(view.FailureKind=="authentication"&&view.Failure==loginError&&view.LoginCompleted,"a nonauthentication disconnect retains the prior login error and completed login history");
+   eventsType.GetMethod("OnAutoReconnected").Invoke(events,null);
+   Assert(!view.LoggedIn&&view.LoginError==loginError&&view.Failure==loginError,"a late recovery cannot undo a terminal disconnect");
    view.Configure(DisplayPresets.AiWidth,DisplayPresets.AiHeight,true);eventsType.GetMethod("OnLoginComplete").Invoke(events,null);
    var authenticationType=typeof(ChildSessionView).GetNestedType("ClientAuthentication",System.Reflection.BindingFlags.NonPublic);
    Assert(!Convert.ToBoolean(authenticationType.GetMethod("GetAllowPromptingForCredentials").Invoke(client,null)),"a completed explicit logon cannot show another credential prompt during recovery");
@@ -113,6 +134,88 @@ internal static class ServiceTests {
    Assert(reconnect(1028,ChildSessionView.ReconnectAttempts+1)==1&&!view.Reconnecting&&view.FailureKind=="connection","native retry exhaustion becomes a terminal connection failure");
    Assert(view.Connection==0&&!form.Visible,"reconnection event checks send no actual connection, credentials, input or shown UI");
   }
+ }
+ static void CheckLogonFailure(){
+  string root=Path.Combine(Path.GetTempPath(),"catheryne-logon-test-"+Guid.NewGuid().ToString("N"));int priorChild=WindowsChildSession.Child;
+  var type=typeof(GameEnvironment).GetNestedType("EnvironmentWindow",System.Reflection.BindingFlags.NonPublic);
+  var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+  try{
+   Directory.CreateDirectory(Path.GetDirectoryName(GameEnvironment.Endpoint(root,WindowsChildSession.Current)));
+   foreach(string scenario in new[]{"automatic","initial-explicit","initial-timeout","prompting","reconnect-denied","disconnected","disconnect-first","post-logon","post-logon-disconnect"}){
+    bool interactive=scenario!="automatic";
+    using(var form=(System.Windows.Forms.Form)Activator.CreateInstance(type,flags,null,new object[]{root,WindowsChildSession.Current,interactive},null)){
+     var view=(ChildSessionView)type.GetField("view",flags).GetValue(form);
+     var eventsType=typeof(ChildSessionView).GetNestedType("SessionEvents",System.Reflection.BindingFlags.NonPublic);
+     var events=Activator.CreateInstance(eventsType,flags,null,new object[]{view},null);
+     if(scenario=="post-logon"||scenario=="post-logon-disconnect")eventsType.GetMethod("OnLoginComplete").Invoke(events,null);
+     var endpoint=(System.Collections.Generic.Dictionary<string,object>)type.GetField("endpoint",flags).GetValue(form);
+     if(scenario=="prompting"){type.GetField("prompting",flags).SetValue(form,true);endpoint["connection_phase"]="authenticating";}
+     if(scenario=="disconnect-first")eventsType.GetMethod("OnDisconnected").Invoke(events,new object[]{1028});
+     eventsType.GetMethod("OnLogonError").Invoke(events,new object[]{0});string message=view.LoginError;
+     if(scenario=="reconnect-denied")eventsType.GetMethod("OnAutoReconnecting").Invoke(events,new object[]{1028,1,null});
+     if(scenario=="disconnected")eventsType.GetMethod("OnDisconnected").Invoke(events,new object[]{1028});
+     if(scenario=="post-logon-disconnect")eventsType.GetMethod("OnDisconnected").Invoke(events,new object[]{2055});
+     if(scenario=="initial-timeout")type.GetField("connectionTimeout",flags).SetValue(form,TimeSpan.Zero);
+     type.GetMethod("Poll",flags).Invoke(form,null);
+     var receipt=StoryClient.Read(GameEnvironment.Endpoint(root,WindowsChildSession.Current));
+     Assert(CodexChat.S(receipt,"error")==message,"host publishes the original login error code for "+scenario);
+     Assert(Convert.ToInt32(receipt["login_error_code"])==0&&CodexChat.S(GameEnvironment.Status(root),"error")==message,"status preserves the numeric login error in the current locale");
+     bool waiting=scenario=="initial-explicit"||scenario=="prompting";
+     Assert(CodexChat.S(receipt,"state")== (waiting?"starting":"failed"),"only an unfinished explicit login retains its current authentication attempt: "+scenario);
+     if(waiting){
+      Assert(!form.IsDisposed&&view.Connection==0&&type.GetField("workerStart",flags).GetValue(form)==null,"waiting login neither reconnects nor launches an executor");
+      eventsType.GetMethod("OnLogonError").Invoke(events,new object[]{-2});type.GetMethod("Poll",flags).Invoke(form,null);
+      Assert(CodexChat.S(StoryClient.Read(GameEnvironment.Endpoint(root,WindowsChildSession.Current)),"error")==message,"logon progress leaves the visible error until actual completion");
+      // Freeze worker startup so this synthetic completion never starts a real child worker.
+      type.GetField("launched",flags).SetValue(form,true);eventsType.GetMethod("OnLoginComplete").Invoke(events,null);type.GetMethod("Poll",flags).Invoke(form,null);
+      Assert(!StoryClient.Read(GameEnvironment.Endpoint(root,WindowsChildSession.Current)).ContainsKey("error"),"actual login completion clears the pending UI error");
+     }else{
+      Assert(CodexChat.S(receipt,"failure_kind")=="authentication","login failure remains authentication after terminal events");
+      Reject(()=>GameEnvironment.RequireConnectionRequest(receipt,false,false),"ordinary requests cannot retry the failed login");
+     }
+     Assert(type.GetField("workerStart",flags).GetValue(form)==null&&!form.Visible&&WindowsChildSession.Child==priorChild,"synthetic logon tests preserve all actual sessions and send no input");
+    }
+   }
+   using(var form=(System.Windows.Forms.Form)Activator.CreateInstance(type,flags,null,new object[]{root,WindowsChildSession.Current,true},null)){
+    // A fresh Connect clears the view's code before configuring COM. A failed configuration must replace the old receipt error.
+    var endpoint=(System.Collections.Generic.Dictionary<string,object>)type.GetField("endpoint",flags).GetValue(form);endpoint["login_error_code"]=0;endpoint["error"]=ChildSessionView.LogonErrorMessage(0);
+    type.GetMethod("Fail",flags).Invoke(form,new object[]{new IOException("new-connection-configuration-failure")});
+    var receipt=GameEnvironment.Status(root);
+    Assert(!receipt.ContainsKey("login_error_code")&&CodexChat.S(receipt,"error")=="new-connection-configuration-failure","a new connection configuration failure cannot be hidden by a previous attempt's login code");
+   }
+  }finally{if(Directory.Exists(root))Directory.Delete(root,true);}
+ }
+ static void CheckConnectionPanel(){
+  string root=Path.Combine(Path.GetTempPath(),"catheryne-login-panel-"+Guid.NewGuid().ToString("N"));
+  var previous=System.Threading.SynchronizationContext.Current;System.Threading.SynchronizationContext.SetSynchronizationContext(new System.Windows.Threading.DispatcherSynchronizationContext());
+  try{
+   AppPreferences.Set("gameExecution","isolated",root);string message=ChildSessionView.LogonErrorMessage(0);
+   Directory.CreateDirectory(Path.GetDirectoryName(GameEnvironment.Endpoint(root,WindowsChildSession.Current)));
+   using(var me=System.Diagnostics.Process.GetCurrentProcess())AtomicFile.Write(GameEnvironment.Endpoint(root,WindowsChildSession.Current),CatheryneTools.Json().Serialize(new{state="starting",connection_phase="authenticating",error=message,host_pid=me.Id,host_started=me.StartTime.ToUniversalTime().Ticks,parent_session=WindowsChildSession.Current}));
+   System.Windows.Window owner;using(var xaml=File.OpenRead(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"Main.xaml")))owner=(System.Windows.Window)System.Windows.Markup.XamlReader.Load(xaml);
+   var content=new System.Windows.Controls.StackPanel();
+   using(var panel=new GameEnvironmentPanel(owner,content,root)){
+    var flags=System.Reflection.BindingFlags.Instance|System.Reflection.BindingFlags.NonPublic;
+    var status=(System.Windows.Controls.TextBlock)typeof(GameEnvironmentPanel).GetField("status",flags).GetValue(panel);
+    var frame=new System.Windows.Threading.DispatcherFrame();var watch=System.Diagnostics.Stopwatch.StartNew();var timer=new System.Windows.Threading.DispatcherTimer{Interval=TimeSpan.FromMilliseconds(20)};
+    timer.Tick+=(s,e)=>{if(status.Text.Contains(message)||watch.ElapsedMilliseconds>3000){timer.Stop();frame.Continue=false;}};timer.Start();System.Windows.Threading.Dispatcher.PushFrame(frame);
+    Assert(status.Text==Locale.T("로그인 대기 중")+"\n"+message,"pending explicit login visibly retains the actual error without ending the authentication wait");
+    foreach(string field in new[]{"connect","preview","manual","stop"}){
+     var button=(System.Windows.Controls.Button)typeof(GameEnvironmentPanel).GetField(field,flags).GetValue(panel);
+     Assert(button.IsEnabled==(field=="stop"),"pending authentication permits termination but no duplicate connection or game input");
+    }
+    var surface=new System.Windows.Controls.Border{Child=content,Resources=owner.Resources,Padding=new System.Windows.Thickness(16),Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(29,33,40))};
+    surface.SetValue(System.Windows.Documents.TextElement.ForegroundProperty,System.Windows.Media.Brushes.White);
+    foreach(int width in new[]{320,780}){
+     surface.Measure(new System.Windows.Size(width,double.PositiveInfinity));surface.Arrange(new System.Windows.Rect(0,0,width,surface.DesiredSize.Height));surface.UpdateLayout();
+     var rendered=new System.Windows.Threading.DispatcherFrame();var animation=new System.Windows.Threading.DispatcherTimer{Interval=TimeSpan.FromMilliseconds(300)};animation.Tick+=(s,e)=>{animation.Stop();rendered.Continue=false;};animation.Start();System.Windows.Threading.Dispatcher.PushFrame(rendered);surface.UpdateLayout();
+     Assert(status.ActualHeight>0&&status.TranslatePoint(new System.Windows.Point(),surface).X+status.ActualWidth<=width+.5,"login error remains visible and fits the rendered panel");
+     var image=new System.Windows.Media.Imaging.RenderTargetBitmap(width,(int)Math.Ceiling(surface.ActualHeight),96,96,System.Windows.Media.PixelFormats.Pbgra32);image.Render(surface);
+     var png=new System.Windows.Media.Imaging.PngBitmapEncoder();png.Frames.Add(System.Windows.Media.Imaging.BitmapFrame.Create(image));using(var file=File.Create(Path.Combine(Path.GetTempPath(),"catheryne-login-panel-"+Locale.LanguageCode+"-"+width+".png")))png.Save(file);
+    }
+   }
+   owner.Close();
+  }finally{System.Threading.SynchronizationContext.SetSynchronizationContext(previous);if(Directory.Exists(root))Directory.Delete(root,true);}
  }
  static void CheckConnectionWait(){
   Func<string,string,System.Collections.Generic.Dictionary<string,object>> endpoint=(state,phase)=>new System.Collections.Generic.Dictionary<string,object>{{"state",state},{"connection_phase",phase},{"error","authentication canceled"}};
@@ -294,7 +397,7 @@ internal static class ServiceTests {
   }finally{Directory.Delete(root,true);}
  }
  internal static void Run(){
-  CheckPrivateIpc();CheckConnectionConfiguration();CheckConnectionWait();CheckConnectionFailure();CheckEnvironmentLifecycle();CheckHostStartup();CheckProcessImageOwnership();CheckWorkerStartup();CheckLaunchPurpose();CheckDisconnectedEnvironment();
+  CheckPrivateIpc();CheckConnectionConfiguration();CheckLogonFailure();CheckConnectionPanel();CheckConnectionWait();CheckConnectionFailure();CheckEnvironmentLifecycle();CheckHostStartup();CheckProcessImageOwnership();CheckWorkerStartup();CheckLaunchPurpose();CheckDisconnectedEnvironment();
   using(var current=System.Diagnostics.Process.GetCurrentProcess()){
    Assert(GameEnvironment.OwnsProcess(current.Id,current.StartTime.ToUniversalTime().ToString("o")),"current session owner identity verified");
    Assert(!GameEnvironment.OwnsProcess(current.Id,new DateTime(1970,1,1,0,0,0,DateTimeKind.Utc).ToString("o")),"reused PID cannot own an old session task");

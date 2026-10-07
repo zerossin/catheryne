@@ -70,11 +70,12 @@ internal static class GameEnvironment {
  internal static Dictionary<string,object> Status(string root){
   string file=Endpoint(root,WindowsChildSession.Current);if(!File.Exists(file))return new Dictionary<string,object>{{"state","stopped"}};
   var endpoint=StoryClient.Read(file);
+  if(endpoint.ContainsKey("login_error_code"))endpoint["error"]=ChildSessionView.LogonErrorMessage(Number(endpoint,"login_error_code"));
   if(CodexChat.S(endpoint,"state")=="failed"){
    // Windows reuses session numbers. A previous logon's failure must not block a new logon.
    long logon=WindowsChildSession.LogonTime(WindowsChildSession.Current);
    if(logon>0&&endpoint.ContainsKey("host_started")&&Ticks(endpoint,"host_started")>0&&Ticks(endpoint,"host_started")<logon)return new Dictionary<string,object>{{"state","stopped"}};
-   if(CodexChat.S(endpoint,"failure_kind")=="authentication")endpoint["error"]=ChildSessionView.DisconnectMessage(2055,null);
+   if(CodexChat.S(endpoint,"failure_kind")=="authentication"&&!endpoint.ContainsKey("login_error_code"))endpoint["error"]=ChildSessionView.DisconnectMessage(2055,null);
    return endpoint;
   }
   if(!endpoint.ContainsKey("host_pid")||!SameProcess(Number(endpoint,"host_pid"),Ticks(endpoint,"host_started"),WindowsChildSession.Current,Image(endpoint,"host")))return new Dictionary<string,object>{{"state","stopped"}};
@@ -287,12 +288,20 @@ internal static class GameEnvironment {
   }
   void Poll(){try{
    if(view.Failure!=null){
-    if(interactiveAuthentication&&!prompting&&!view.LoggedIn&&view.FailureKind=="authentication"){
+    if(interactiveAuthentication&&!prompting&&!view.LoginCompleted&&view.DisconnectReason==2055){
      if(view.Connection!=0){if(watch.Elapsed<connectionTimeout)return;throw new IOException(view.Failure);}
      // Try Windows' existing authentication first. Only the user's Connect action may request a dialog once.
      prompting=true;endpoint["connection_phase"]="authenticating";AtomicFile.Write(Endpoint(root,parent),CatheryneTools.Json().Serialize(endpoint));watch.Restart();Trace("authentication-required");view.Connect(DisplayPresets.AiWidth,DisplayPresets.AiHeight,true);return;
     }
     throw new IOException(view.Failure);
+   }
+   if(view.LoginError!=null){
+    // The user may correct credentials in the existing explicit login. Automation cannot do so.
+    view.FailureKind="authentication";
+    if(!interactiveAuthentication||view.LoginCompleted||launched)throw new IOException(view.LoginError);
+    if(CodexChat.S(endpoint,"error")!=view.LoginError){endpoint["error"]=view.LoginError;endpoint["login_error_code"]=view.LoginErrorCode.Value;AtomicFile.Write(Endpoint(root,parent),CatheryneTools.Json().Serialize(endpoint));}
+   }else if(!StartupFailed&&endpoint.ContainsKey("login_error_code")){
+    endpoint.Remove("error");endpoint.Remove("login_error_code");AtomicFile.Write(Endpoint(root,parent),CatheryneTools.Json().Serialize(endpoint));
    }
    if(view.Reconnecting||recoveringConnection){
     if(!recoveringConnection){recoveringConnection=true;watch.Restart();}
@@ -307,7 +316,7 @@ internal static class GameEnvironment {
    // The WTS token appears before the interactive logon has finished. Wait for the client completion event too.
    if(!StartupFailed&&!launched&&view.LoggedIn&&(child=WindowsChildSession.Child)>=0&&WindowsChildSession.LoggedOn(child)){
     WindowsChildSession.RequireTarget(child,parent,child);launched=true;watch.Restart();
-    endpoint["child_session"]=child;endpoint["connection_phase"]="starting-worker";AtomicFile.Write(Endpoint(root,parent),CatheryneTools.Json().Serialize(endpoint));
+    endpoint["child_session"]=child;endpoint["connection_phase"]="starting-worker";endpoint.Remove("error");endpoint.Remove("login_error_code");AtomicFile.Write(Endpoint(root,parent),CatheryneTools.Json().Serialize(endpoint));
     string pipe=CodexChat.S(endpoint,"pipe");int host=Number(endpoint,"host_pid");long started=Ticks(endpoint,"host_started");
     workerStart=Task.Run(()=>WindowsChildSession.StartWorker(child,parent,root,pipe,host,started,controlStop.Token));
    }
@@ -328,7 +337,7 @@ internal static class GameEnvironment {
    if(!automatic)recovered=false;Trace("worker-recover");launched=false;ready=false;endpoint["state"]="starting";endpoint["connection_phase"]="starting-worker";endpoint.Remove("error");endpoint.Remove("failure_kind");endpoint.Remove("worker_pid");endpoint.Remove("worker_started");endpoint.Remove("worker_image");endpoint["pipe"]=Prefix+Guid.NewGuid().ToString("N");
    AtomicFile.Write(Endpoint(root,parent),CatheryneTools.Json().Serialize(endpoint));watch.Restart();
   }
-  void Fail(Exception error){var cause=error.GetBaseException();AppDiagnostics.Record(DiagnosticEvent.RuntimeFailure,cause,root);Trace("connection-failed",cause.HResult);endpoint["state"]="failed";endpoint["failure_kind"]=view.FailureKind??"connection";endpoint["error"]=cause.Message;AtomicFile.Write(Endpoint(root,parent),CatheryneTools.Json().Serialize(endpoint));closing=true;Close();}
+  void Fail(Exception error){var cause=error.GetBaseException();AppDiagnostics.Record(DiagnosticEvent.RuntimeFailure,cause,root);Trace("connection-failed",cause.HResult);endpoint["state"]="failed";endpoint["failure_kind"]=view.FailureKind??"connection";endpoint["error"]=cause.Message;if(view.LoginErrorCode.HasValue)endpoint["login_error_code"]=view.LoginErrorCode.Value;else endpoint.Remove("login_error_code");AtomicFile.Write(Endpoint(root,parent),CatheryneTools.Json().Serialize(endpoint));closing=true;Close();}
   protected override void Dispose(bool disposing){
    if(disposing&&!resourcesReleased){
     resourcesReleased=true;controlStop.Cancel();timer.Stop();timer.Dispose();

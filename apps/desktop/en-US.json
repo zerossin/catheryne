@@ -1717,6 +1717,7 @@
   "게임 입력을 확인해 주세요.": "Check the game input.",
   "현재 게임 화면을 확인해 주세요.": "Check the current game screen.",
   "열기": "Open",
+  "게임 실행 환경 로그인 오류 ({0}).": "Game environment sign-in error ({0}).",
   "알림": "Notifications",
   "Windows 알림 설정": "Windows notification settings",
   "Windows 자동 HDR": "Windows Auto HDR",
