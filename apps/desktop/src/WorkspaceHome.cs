@@ -20,7 +20,7 @@ internal sealed class WorkspaceHome : IDisposable {
  readonly List<string> selectedFiles=new List<string>();
  internal Func<System.Threading.Tasks.Task<string>> CaptureRequested;
  internal Func<System.Threading.Tasks.Task<SavedCapture>> TheaterCaptureRequested;bool judgingTheater;
- Button send;string connectionHint=Locale.T("연결 확인 중…"); readonly AiWorkspacePanel aiPanel; readonly Dictionary<string,AiTaskCard> taskCards=new Dictionary<string,AiTaskCard>();ScrollViewer conversation;int sendingRequest,connectionVersion;bool busy,hasMessages,connecting,recovering,switchingProvider;
+ Button send;string connectionHint; readonly AiWorkspacePanel aiPanel; readonly Dictionary<string,AiTaskCard> taskCards=new Dictionary<string,AiTaskCard>();ScrollViewer conversation;int sendingRequest,connectionVersion;bool busy,hasMessages,connecting,recovering,switchingProvider;
  ChatResponseCopy responseCopy;
  ChatMessageActions lastUserActions;Button editRequestButton;string editableTurn;
  CodexChat.InterruptedRequest editingRequest;string savedDraft;int savedCaret;string[] savedFiles;UIElement[] savedPreviews;
@@ -78,6 +78,7 @@ internal sealed class WorkspaceHome : IDisposable {
   AddNavigation(rail,"화면·성능","M3,4 H21 V16 H3 Z M8,20 H16 M12,16 V20",()=>Show("화면·성능"));
   AddNavigation(rail,"캘린더","M4,5 H20 V21 H4 Z M4,10 H20 M8,3 V7 M16,3 V7",()=>Show("캘린더"));
   ((Button)window.FindName("Home")).Click+=(s,e)=>Home();
+  connectionHint=Locale.Format("{0} 연결 확인 중…",chat.ProviderName);
   var layout=new Grid {Margin=new Thickness(28,12,28,12)};
   layout.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});layout.RowDefinitions.Add(new RowDefinition());layout.RowDefinitions.Add(new RowDefinition{Height=GridLength.Auto});
   aiPanel=new AiWorkspacePanel(window,chat,close,detail);aiPanel.OpenFeature=Open;
@@ -95,13 +96,14 @@ internal sealed class WorkspaceHome : IDisposable {
   draft.CaretBrush=new SolidColorBrush(Color.FromRgb(224,228,234));draft.Foreground=Brushes.White;draft.IsReadOnlyCaretVisible=true;draft.MinHeight=54;draft.Background=Brushes.Transparent;draft.BorderThickness=new Thickness(0);draft.Padding=new Thickness(4,8,4,8);
   draft.FocusVisualStyle=null;
   draft.Template=(ControlTemplate)System.Windows.Markup.XamlReader.Parse("<ControlTemplate xmlns='http://schemas.microsoft.com/winfx/2006/xaml/presentation' TargetType='TextBox'><Border Background='{TemplateBinding Background}'><ScrollViewer x:Name='PART_ContentHost' xmlns:x='http://schemas.microsoft.com/winfx/2006/xaml' Focusable='False'/></Border></ControlTemplate>");
-  var inputArea=PanelUi.TextInput(draft,Locale.T("연결 확인 중…"));inputArea.Background=Brushes.Transparent;inputArea.PreviewMouseDown+=(s,e)=>{if(!chat.Connected){e.Handled=true;Connection();}};
+  var inputArea=PanelUi.TextInput(draft,Locale.Format("{0} 연결 확인 중…",chat.ProviderName));inputArea.Background=Brushes.Transparent;inputArea.PreviewMouseDown+=(s,e)=>{if(!chat.Connected){e.Handled=true;Connection();}};
   var editTitle=PanelUi.Text(Locale.T("중단한 요청 수정"),true);editTitle.VerticalAlignment=VerticalAlignment.Center;var cancelEdit=PanelUi.Button(Locale.T("취소"));cancelEdit.Margin=new Thickness(8,0,0,0);cancelEdit.HorizontalAlignment=HorizontalAlignment.Right;cancelEdit.Click+=(s,e)=>{if(!busy&&!resuming)CancelEdit();};DockPanel.SetDock(cancelEdit,Dock.Right);editMode.Children.Add(cancelEdit);editMode.Children.Add(editTitle);composer.Children.Add(editMode);
   composer.Children.Add(attachments);composer.Children.Add(inputArea);
   System.Windows.Input.CommandManager.AddPreviewCanExecuteHandler(draft,(s,e)=>{if(e.Command!=System.Windows.Input.ApplicationCommands.Paste)return;try{if(ChatAttachments.CanPaste(Clipboard.GetDataObject())){e.CanExecute=true;e.Handled=true;}}catch(System.Runtime.InteropServices.ExternalException){}});
   System.Windows.Input.CommandManager.AddPreviewExecutedHandler(draft,(s,e)=>{if(e.Command!=System.Windows.Input.ApplicationCommands.Paste)return;try{e.Handled=PasteAttachments(Clipboard.GetDataObject());}catch(Exception error){e.Handled=true;MessageBox.Show(window,error.Message,"Catheryne");}});
-  var row=new DockPanel {Margin=new Thickness(0,6,0,0)};
-  send=IconButton("M12,18 V6 M6,12 L12,6 L18,12","보내기",true);send.IsEnabled=false;send.Click+=async(s,e)=>{if(!chat.Connected)Connection();else await SendMessage();};DockPanel.SetDock(send,Dock.Right);row.Children.Add(send);
+  var row=new Grid {Margin=new Thickness(0,6,0,0)};
+  for(int column=0;column<5;column++)row.ColumnDefinitions.Add(new ColumnDefinition{Width=column==2?new GridLength(1,GridUnitType.Star):GridLength.Auto});
+  send=IconButton("M12,18 V6 M6,12 L12,6 L18,12","보내기",true);send.IsEnabled=false;send.Click+=async(s,e)=>{if(!chat.Connected)Connection();else await SendMessage();};Grid.SetColumn(send,4);row.Children.Add(send);
   draft.PreviewKeyDown+=async(s,e)=>{if(e.Key==System.Windows.Input.Key.Enter&&(System.Windows.Input.Keyboard.Modifiers&System.Windows.Input.ModifierKeys.Shift)==0){e.Handled=true;if(!busy&&send.IsEnabled)await SendMessage();}};
   var controls=new StackPanel {Orientation=Orientation.Horizontal,VerticalAlignment=VerticalAlignment.Center};
   var attach=IconButton("M8,14 L15,7 Q19,3 21,7 Q22,9 19,12 L10,21 Q6,24 3,20 Q1,17 5,13 L14,4","파일 첨부",false);
@@ -114,7 +116,7 @@ internal sealed class WorkspaceHome : IDisposable {
   var folder=PanelUi.Button("",false);folder.Background=Brushes.Transparent;folder.MinWidth=0;folder.Margin=new Thickness(6,0,0,0);folder.Padding=new Thickness(8,0,8,0);folder.Height=36;folder.VerticalAlignment=VerticalAlignment.Center;
   var folderLabel=new StackPanel{Orientation=Orientation.Horizontal};folderLabel.Children.Add(Icon("M3,7 H10 L12,10 H21 V20 H3 Z M3,7 V5 H10 L12,7",18));folderLabel.Children.Add(new TextBlock{Text="Catheryne",Foreground=new SolidColorBrush(Color.FromRgb(174,181,190)),Margin=new Thickness(7,0,0,0),VerticalAlignment=VerticalAlignment.Center});folder.Content=folderLabel;folder.ToolTip=chat.Workspace;
   folder.Click+=(s,e)=>{System.IO.Directory.CreateDirectory(chat.Workspace);System.Diagnostics.Process.Start(new System.Diagnostics.ProcessStartInfo(chat.Workspace){UseShellExecute=true});};controls.Children.Add(folder);
-  var modelControls=new StackPanel{Orientation=Orientation.Horizontal,VerticalAlignment=VerticalAlignment.Center};modelControls.Children.Add(aiPanel.ModelButton);modelControls.Children.Add(aiPanel.Usage);DockPanel.SetDock(modelControls,Dock.Right);row.Children.Add(modelControls);
+  Grid.SetColumn(aiPanel.Providers,1);row.Children.Add(aiPanel.Providers);Grid.SetColumn(aiPanel.ModelButton,2);aiPanel.ModelButton.HorizontalAlignment=HorizontalAlignment.Stretch;row.Children.Add(aiPanel.ModelButton);Grid.SetColumn(aiPanel.Usage,3);row.Children.Add(aiPanel.Usage);
   row.Children.Add(controls);composer.Children.Add(row);  var inputCard=new Border {Child=composer,Background=new SolidColorBrush(Color.FromRgb(38,41,46)),BorderBrush=new SolidColorBrush(Color.FromRgb(65,69,74)),BorderThickness=new Thickness(1),CornerRadius=PanelUi.Corners,Padding=new Thickness(18,12,18,12),MaxWidth=ChatLayout.MaxWidth,Margin=new Thickness(0,0,SystemParameters.VerticalScrollBarWidth,0),HorizontalAlignment=HorizontalAlignment.Stretch};
   new ChatAttachmentDrop(window,inputCard,PasteAttachments,error=>MessageBox.Show(window,error.Message,"Catheryne"));
   Grid.SetRow(inputCard,2);layout.Children.Add(inputCard);host.Child=layout;host.PreviewMouseDown+=(s,e)=>{if(menu.Visibility==Visibility.Visible){conversationOpen=true;close();RefreshVisibility();}};
@@ -277,26 +279,26 @@ internal sealed class WorkspaceHome : IDisposable {
   foreach(var entry in entries){string id=CodexChat.S(entry,"id"),title=HistoryTitle(entry);if(string.IsNullOrWhiteSpace(title))title=Locale.T("대화");var button=PanelUi.Button("",false);button.Content=new TextBlock{Text=title,TextTrimming=TextTrimming.CharacterEllipsis};button.Height=44;button.Margin=new Thickness(0,0,0,6);button.Background=id==chat.ThreadId?new SolidColorBrush(Color.FromRgb(53,64,71)):new SolidColorBrush(Color.FromRgb(35,38,44));button.HorizontalContentAlignment=HorizontalAlignment.Left;button.HorizontalAlignment=HorizontalAlignment.Stretch;button.ToolTip=title;button.IsEnabled=!busy;button.Click+=async(s,e)=>await Resume(id);var actions=PanelUi.Menu();var archive=new MenuItem{Header=Locale.T("대화 보관")};archive.Click+=async(s,e)=>{try{int navigation=conversationRequest;bool reset=await chat.Archive(id);if(reset&&navigation==conversationRequest&&chat.ThreadId==null)NewConversation();else RenderHistory(chat.CachedHistory());}catch(Exception error){MessageBox.Show(window,error.Message,"Catheryne");}};actions.Items.Add(archive);button.ContextMenu=actions;historyList.Children.Add(button);}
  }
 
- void ApplyConnection(){aiPanel.UpdateAccount();PanelUi.InputHint(draft,chat.Connected?Locale.T("메시지를 입력하세요."):connectionHint??Locale.Format("{0}에 로그인하세요.",chat.ProviderName));draft.IsEnabled=chat.Connected&&!resuming&&!switchingProvider;send.IsEnabled=!resuming&&!connecting&&!switchingProvider;send.ToolTip=chat.Connected?Locale.T("보내기"):Locale.Format("{0} 로그인",chat.ProviderName);aiPanel.ModelButton.Visibility=chat.Connected?Visibility.Visible:Visibility.Hidden;aiPanel.Usage.Visibility=aiPanel.ModelButton.Visibility;}
+ void ApplyConnection(){aiPanel.UpdateAccount();aiPanel.SetBusy(busy||switchingProvider,connecting||resuming);PanelUi.InputHint(draft,chat.Connected?Locale.T("메시지를 입력하세요."):connectionHint??Locale.Format("{0}에 로그인하세요.",chat.ProviderName));draft.IsEnabled=chat.Connected&&!resuming&&!switchingProvider;send.IsEnabled=!resuming&&!connecting&&!switchingProvider;send.ToolTip=chat.Connected?Locale.T("보내기"):Locale.Format("{0} 로그인",chat.ProviderName);aiPanel.ModelButton.Visibility=chat.Connected?Visibility.Visible:Visibility.Hidden;aiPanel.Usage.Visibility=aiPanel.ModelButton.Visibility;}
  async System.Threading.Tasks.Task SelectProvider(string provider){
   if(provider==chat.Provider)return;if(busy||connecting||resuming||switchingProvider)throw new InvalidOperationException(Locale.T("진행 중인 작업이 끝난 뒤 AI를 변경해 주세요."));
-  switchingProvider=true;++connectionVersion;aiPanel.SetBusy(true);ApplyConnection();
+  switchingProvider=true;++connectionVersion;ApplyConnection();
   try{await chat.SelectProvider(provider);CancelEdit();CancelResume();RenderConversation(new Dictionary<string,object>(),new List<AiTaskRecord>());AppPreferences.Set("aiProvider",provider);aiPanel.ResetUsage();await CheckConnection();}
-  finally{switchingProvider=false;aiPanel.SetBusy(busy);ApplyConnection();}
+  finally{switchingProvider=false;ApplyConnection();}
  }
  async System.Threading.Tasks.Task ConnectProvider(string provider){await SelectProvider(provider);await Connect();}
  public void Dispose(){typingClock.Stop();activityClock.Stop();ClearQuestions();aiPanel.Dispose();chat.Dispose();}
  async System.Threading.Tasks.Task CheckConnection(){
   int version=++connectionVersion;
-  connectionHint=Locale.T("연결 확인 중…");ApplyConnection();
+  connectionHint=Locale.Format("{0} 연결 확인 중…",chat.ProviderName);ApplyConnection();
   try{await chat.Account();if(version!=connectionVersion)return;connectionHint=null;draft.ToolTip=null;ApplyConnection();if(chat.Connected){await aiPanel.LoadModels();if(version!=connectionVersion)return;await chat.EnsureProject();if(version==connectionVersion){var warm=chat.History();}}}
   catch(Exception error){if(version!=connectionVersion)return;AppDiagnostics.Record(DiagnosticEvent.AiConnectionFailure,error);connectionHint=error.Message;draft.ToolTip=error.Message;ApplyConnection();}
  }
  async void Connection(){await AccountConnections.For(window).Connect(chat.Provider);}
  async System.Threading.Tasks.Task Connect(){
-  if(connecting)return;connecting=true;connectionHint=Locale.T("연결 확인 중…");ApplyConnection();
-  try{bool connected=false;try{connected=await chat.Account();}catch(ClaudeAccountRequired){}if(connected){connectionHint=null;ApplyConnection();await aiPanel.LoadModels();return;}connectionHint=Locale.T("로그인 대기 중");ApplyConnection();await chat.Login();if(chat.Provider==AiProviders.Claude)await CheckConnection();}
-  catch(Exception error){connectionHint=Locale.T("연결 다시 시도");draft.ToolTip=error.Message;ApplyConnection();MessageBox.Show(window,error.Message,"Catheryne");}
+  if(connecting)return;connecting=true;connectionHint=Locale.Format("{0} 연결 확인 중…",chat.ProviderName);ApplyConnection();
+  try{bool connected=false;try{connected=await chat.Account();}catch(ClaudeAccountRequired){}if(connected){connectionHint=null;ApplyConnection();await aiPanel.LoadModels();return;}connectionHint=Locale.Format("{0} 로그인 대기 중",chat.ProviderName);ApplyConnection();await chat.Login();if(chat.Provider==AiProviders.Claude)await CheckConnection();}
+  catch(Exception error){connectionHint=Locale.Format("{0} 연결 다시 시도",chat.ProviderName);draft.ToolTip=error.Message;ApplyConnection();MessageBox.Show(window,error.Message,"Catheryne");}
   finally{connecting=false;ApplyConnection();}
  }
  void AnimateBackground(bool active){if(shaded==active)return;shaded=active;var shade=(Border)window.FindName("ChatShade");shade.BeginAnimation(UIElement.OpacityProperty,new System.Windows.Media.Animation.DoubleAnimation(active?0.88:0,TimeSpan.FromMilliseconds(420)));var brush=(LinearGradientBrush)shade.Background;brush.BeginAnimation(LinearGradientBrush.StartPointProperty,new System.Windows.Media.Animation.PointAnimation(active?new Point(0,0):new Point(0,0.8),TimeSpan.FromMilliseconds(420)){EasingFunction=new System.Windows.Media.Animation.CubicEase{EasingMode=System.Windows.Media.Animation.EasingMode.EaseInOut}});}
@@ -418,7 +420,7 @@ internal sealed class WorkspaceHome : IDisposable {
   catch(Exception error){if(request!=sendingRequest)return;draft.Text=text;Message(error.Message,false);SetActivity(Locale.T("응답 실패"));Finish(true);}
  }
  void RenderPending(bool flush){bool follow=FollowingEnd();foreach(var reply in new List<ChatText>(pendingText.Keys)){string text=pendingText[reply];int take=flush?text.Length:Math.Min(text.Length,Math.Max(2,(text.Length+7)/8));if(take<text.Length&&take>0&&char.IsHighSurrogate(text[take-1]))take++;reply.Text+=text.Substring(0,take);if(take==text.Length)pendingText.Remove(reply);else pendingText[reply]=text.Substring(take);}if(pendingText.Count==0)typingClock.Stop();if(follow)conversation.ScrollToEnd();}
- void Finish(bool keepStatus=false){foreach(var card in taskOrder){card.Hold(false);if(!string.IsNullOrEmpty(card.Task.TurnId))closedTaskTurns.Add(card.Task.TurnId);}activityClock.Stop();UpdateElapsed(true);foreach(var line in toolEvents.Values)if(Equals(line.Tag,true)){line.Tag=false;line.Foreground=new SolidColorBrush(Color.FromRgb(155,162,172));line.Text=Locale.T("◦ 실행 종료 (결과 미확인)");}RenderPending(true);activity.Visibility=keepStatus?Visibility.Visible:Visibility.Collapsed;activity.Foreground=new SolidColorBrush(Color.FromRgb(155,162,172));busy=false;send.Content=Icon("M12,18 V6 M6,12 L12,6 L18,12",20,true);ApplyConnection();aiPanel.SetBusy(false);if(keepStatus)SetActivity(activity.Text);ContinueTheaterCapture(keepStatus);}
+ void Finish(bool keepStatus=false){foreach(var card in taskOrder){card.Hold(false);if(!string.IsNullOrEmpty(card.Task.TurnId))closedTaskTurns.Add(card.Task.TurnId);}activityClock.Stop();UpdateElapsed(true);foreach(var line in toolEvents.Values)if(Equals(line.Tag,true)){line.Tag=false;line.Foreground=new SolidColorBrush(Color.FromRgb(155,162,172));line.Text=Locale.T("◦ 실행 종료 (결과 미확인)");}RenderPending(true);activity.Visibility=keepStatus?Visibility.Visible:Visibility.Collapsed;activity.Foreground=new SolidColorBrush(Color.FromRgb(155,162,172));busy=false;send.Content=Icon("M12,18 V6 M6,12 L12,6 L18,12",20,true);ApplyConnection();if(keepStatus)SetActivity(activity.Text);ContinueTheaterCapture(keepStatus);}
  static string TurnOutcomeLabel(string status){return status=="interrupted"?Locale.T("중단됨"):status=="failed"?Locale.T("응답 실패"):null;}
  void RenderTurnOutcome(Dictionary<string,object> turn){
   string label=TurnOutcomeLabel(CodexChat.S(turn,"status"));if(label==null)return;
@@ -454,7 +456,7 @@ internal sealed class WorkspaceHome : IDisposable {
    await System.Threading.Tasks.Task.Delay(1000*(attempt+1));if(!window.IsLoaded)return;
    try{await chat.Account();ApplyConnection();await aiPanel.LoadModels();return;}catch{}
   }}finally{recovering=false;}
-  if(window.IsLoaded){connectionHint=Locale.T("연결 다시 시도");ApplyConnection();}
+  if(window.IsLoaded){connectionHint=Locale.Format("{0} 연결 다시 시도",chat.ProviderName);ApplyConnection();}
  }
  AiTaskFeed Feed(){if(taskFeed==null||feedThread!=chat.ThreadId){feedThread=chat.ThreadId;taskFeed=new AiTaskFeed(Setup.DataFolder,feedThread);}return taskFeed;}
  AiTaskCard ActiveCard(){string turn=currentRequestTurnId??chat.TurnId;return taskOrder.LastOrDefault(c=>c.IsOpen&&c.Task.TurnId==turn);}

@@ -1,4 +1,8 @@
 {
+  "AI 공급자": "AI provider",
+  "{0} 연결 확인 중…": "Checking {0} connection…",
+  "{0} 로그인 대기 중": "Waiting for {0} login",
+  "{0} 연결 다시 시도": "Retry {0} connection",
   "환상극": "Imaginarium Theater",
   "자동화 실행": "Automation execution",
   "자료 확인 중…": "Checking references…",
