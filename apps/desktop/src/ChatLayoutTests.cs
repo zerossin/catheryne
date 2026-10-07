@@ -3,12 +3,28 @@ using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Threading;
+using System.Linq;
+using System.IO;
+using System.Windows.Media.Imaging;
+using System.Windows.Media;
 
 internal static class ChatLayoutTests {
  static void Wait(int milliseconds){var frame=new DispatcherFrame();var timer=new DispatcherTimer{Interval=TimeSpan.FromMilliseconds(milliseconds)};timer.Tick+=(s,e)=>{timer.Stop();frame.Continue=false;};timer.Start();Dispatcher.PushFrame(frame);}
  static void Check(bool value,string message){if(!value)throw new Exception("Chat layout: "+message);}
  [System.Runtime.InteropServices.DllImport("user32.dll")] static extern IntPtr SendMessage(IntPtr hwnd,int message,IntPtr wParam,IntPtr lParam);
  static IntPtr Packed(Point point){return new IntPtr(((long)((int)point.Y&65535)<<16)|(uint)((int)point.X&65535));}
+ static void Accounts(Window window,WorkspaceHome workspace){
+  var panel=(AiWorkspacePanel)typeof(WorkspaceHome).GetField("aiPanel",BindingFlags.NonPublic|BindingFlags.Instance).GetValue(workspace);
+  typeof(AiWorkspacePanel).GetMethod("ShowAccounts",BindingFlags.NonPublic|BindingFlags.Instance).Invoke(panel,null);
+  var popup=(System.Windows.Controls.Primitives.Popup)typeof(AiWorkspacePanel).GetField("accountPopup",BindingFlags.NonPublic|BindingFlags.Instance).GetValue(panel);
+  try{
+   var surface=(Border)popup.Child;surface.Measure(new Size(360,double.PositiveInfinity));surface.Arrange(new Rect(0,0,360,surface.DesiredSize.Height));surface.UpdateLayout();var rows=((StackPanel)surface.Child).Children.Cast<Grid>().ToArray();
+   Check(rows.Length==4&&rows.All(r=>r.ActualHeight==44),"all account providers share equal control heights");
+   foreach(var row in rows){var button=row.Children.OfType<Button>().First();var content=(DockPanel)button.Content;var label=content.Children.OfType<TextBlock>().Last();Check(label.ActualWidth>50&&button.ActualHeight==44,"account names fit without squeezing login actions");}
+   var claude=(DockPanel)rows[1].Children.OfType<Button>().First().Content;Check(claude.Children.OfType<TextBlock>().Last().Text=="Claude"&&claude.Children.OfType<TextBlock>().First().Text==Locale.T("로그인"),"Claude shows its actual disconnected state");
+   var bitmap=new RenderTargetBitmap(360,(int)Math.Ceiling(surface.ActualHeight),96,96,PixelFormats.Pbgra32);bitmap.Render(surface);var png=new PngBitmapEncoder();png.Frames.Add(BitmapFrame.Create(bitmap));using(var output=File.Create(Path.Combine(Path.GetTempPath(),"catheryne-accounts-"+Locale.LanguageCode+"-"+(int)window.Width+".png")))png.Save(output);
+  }finally{popup.IsOpen=false;}
+ }
  static void Caption(Window window){
   var chrome=System.Windows.Shell.WindowChrome.GetWindowChrome(window);Check(!chrome.UseAeroCaptionButtons&&chrome.GlassFrameThickness.Top==0&&chrome.CaptionHeight==LauncherWindowLayout.HeaderHeight,"custom caption visuals retain Windows chrome behavior");
   var hwnd=new System.Windows.Interop.WindowInteropHelper(window).Handle;
@@ -34,13 +50,13 @@ internal static class ChatLayoutTests {
   Action<double> resize=value=>{window.MinWidth=value;window.Width=value;Wait(300);Check(Math.Abs(window.ActualWidth-value)<1,"fixture viewport: expected "+value+", actual "+window.ActualWidth);};
   Action<double> margin=left=>{window.UpdateLayout();var expected=new Thickness(left,LauncherWindowLayout.ChatTop,18,84);Check((Thickness)chat.GetAnimationBaseValue(FrameworkElement.MarginProperty)==expected&&chat.Margin==expected,"transcript and composer reservation: expected "+expected+", base "+chat.GetAnimationBaseValue(FrameworkElement.MarginProperty)+", current "+chat.Margin+", viewport "+window.ActualWidth+", state "+window.WindowState);};
   try{
-   resize(1240);workspace.Show("설정");Wait(300);margin(258);Caption(window);Wait(300);margin(258);
+   resize(1240);workspace.Show("설정");Wait(300);margin(258);Caption(window);Accounts(window,workspace);Wait(300);margin(258);
    Check(chat.TranslatePoint(new Point(),window).X>=menu.TranslatePoint(new Point(menu.ActualWidth,0),window).X,"wide chat must remain to the right of the menu: chat "+chat.TranslatePoint(new Point(),window).X+", menu right "+menu.TranslatePoint(new Point(menu.ActualWidth,0),window).X+", menu width "+menu.ActualWidth+", visibility "+chat.Visibility+", window "+window.ActualWidth);
    DrawerMotion.Hide(menu);Wait(20);workspace.EnsureMenu("설정");Wait(300);Check(DrawerMotion.IsOpen(menu),"reopening the same menu must cancel its pending close");margin(258);
    // Recomputed geometry must be recoverable even when the requested destination did not change.
    chat.BeginAnimation(FrameworkElement.MarginProperty,null);chat.Margin=new Thickness(18,LauncherWindowLayout.ChatTop,18,84);workspace.EnsureMenu("설정");Wait(300);margin(258);
    foreach(string route in new[]{"플레이","내 계정","캘린더","설정"}){workspace.HideMenu();workspace.Show(route);Wait(15);}Wait(300);margin(258);
-   resize(980);margin(18);Caption(window);Check(DrawerMotion.IsOpen(menu),"narrow layout must retain the overlay menu");
+   resize(980);margin(18);Caption(window);Accounts(window,workspace);Check(DrawerMotion.IsOpen(menu),"narrow layout must retain the overlay menu");
    resize(1240);margin(258);
    var feature=(Border)window.FindName("CompanionPage");DrawerMotion.Show(feature);Wait(250);Check(chat.Visibility==Visibility.Collapsed,"a detail panel must keep covering chat");DrawerMotion.Hide(feature);Wait(250);Check(chat.Visibility==Visibility.Visible,"chat must return after the detail panel closes");margin(258);
    workspace.HideMenu();Wait(300);margin(18);

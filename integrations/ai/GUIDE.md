@@ -1,5 +1,9 @@
 # Catheryne operator guide
 
+The desktop supports Codex (ChatGPT) and the official Claude Code CLI adapter. Both use the same Catheryne tool definitions, execution policy and task records. Claude uses the GUI-owned MCP bridge; only the current authorized conversation/turn may execute a tool. A stopped turn cannot reclaim input. Authentication and browser callbacks belong to the official CLI; never read its credential files, collect login codes or supply subscription tokens to the API. Never switch accounts or providers to evade usage limits. Anthropic approval is required for offering claude.ai login in a third-party product; CLI technical support alone is not approval. See [the provider contract and verified scope](../../docs/AI-FUNCTION-PARITY.ko.md#claude-계정-연결-2026-10-07).
+
+Claude exposes the listed Catheryne MCP tools only. Native Codex goal/question tools are unavailable: retain the existing durable task, ask required questions in chat and wait for the human response. MCP images remain standard image content; the Codex code-mode string parsing example below applies only to that transport.
+
 1. Call `catheryne_context` for capabilities and query only records needed for the request. Missing observations are unknown.
 2. Start an explicit game goal with `catheryne_request`. Use `catheryne_game observe`, inspect the image and `register` its observed state. The model chooses state and urgency.
 3. Dialogue registration automatically starts the existing choice-position clicker. It continues through reasoning and observation until state changes. If ineffective, interrupt, record the result, and choose manual input or the BetterGI dialogue executor. Do not restart on each line.

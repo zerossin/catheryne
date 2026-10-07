@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Windows;
@@ -20,7 +20,7 @@ internal sealed class WorkspaceHome : IDisposable {
  readonly List<string> selectedFiles=new List<string>();
  internal Func<System.Threading.Tasks.Task<string>> CaptureRequested;
  internal Func<System.Threading.Tasks.Task<SavedCapture>> TheaterCaptureRequested;bool judgingTheater;
- Button send;string connectionHint=Locale.T("연결 확인 중…"); readonly AiWorkspacePanel aiPanel; readonly Dictionary<string,AiTaskCard> taskCards=new Dictionary<string,AiTaskCard>();ScrollViewer conversation;int sendingRequest;bool busy,hasMessages,connecting,recovering;
+ Button send;string connectionHint=Locale.T("연결 확인 중…"); readonly AiWorkspacePanel aiPanel; readonly Dictionary<string,AiTaskCard> taskCards=new Dictionary<string,AiTaskCard>();ScrollViewer conversation;int sendingRequest,connectionVersion;bool busy,hasMessages,connecting,recovering,switchingProvider;
  ChatResponseCopy responseCopy;
  ChatMessageActions lastUserActions;Button editRequestButton;string editableTurn;
  CodexChat.InterruptedRequest editingRequest;string savedDraft;int savedCaret;string[] savedFiles;UIElement[] savedPreviews;
@@ -122,9 +122,9 @@ internal sealed class WorkspaceHome : IDisposable {
   ((Button)window.FindName("Graphics")).Click+=(s,e)=>HideMenu();
   var toggle=(Button)window.FindName("ToggleHomeChat");toggle.Click+=(s,e)=>{homeChatVisible=!homeChatVisible;conversationOpen=false;AppPreferences.Set("hideHomeChat",!homeChatVisible);RefreshVisibility();};
   chat.Notification+=(name,data)=>window.Dispatcher.BeginInvoke(new Action(()=>OnNotification(name,data)));
-  typingClock.Tick+=(s,e)=>RenderPending(false);window.Closed+=(s,e)=>Dispose();window.Loaded+=async(s,e)=>{if(connectAi)await CheckConnection();};
+  typingClock.Tick+=(s,e)=>RenderPending(false);window.Closed+=(s,e)=>Dispose();window.Loaded+=async(s,e)=>{if(connectAi){try{object provider;AppPreferences.Read().TryGetValue("aiProvider",out provider);if(Convert.ToString(provider)==AiProviders.Claude)await chat.SelectProvider(AiProviders.Claude);await CheckConnection();}catch(Exception error){connectionHint=error.Message;draft.ToolTip=error.Message;ApplyConnection();}}};
   menu.IsVisibleChanged+=(s,e)=>{if(!menu.IsVisible){historyClosing=false;RefreshVisibility();}};
-  aiPanel.LoginRequested+=()=>Connection();
+  aiPanel.LoginRequested=ConnectProvider;aiPanel.ProviderRequested=SelectProvider;
   aiPanel.OpenTask+=async task=>{if(busy&&task.Thread!=chat.ThreadId)return;if(task.Thread!=chat.ThreadId&&!await Resume(task.Thread))return;close();conversationOpen=true;RefreshVisibility();AiTaskCard card;if(taskCards.TryGetValue(task.Id,out card))await window.Dispatcher.InvokeAsync(new Action(()=>card.BringIntoView()));};
   aiPanel.ExecutionChanged+=(task,story)=>{foreach(var card in taskOrder)if(card.IsOpen&&card.Request.Operations.Any(t=>t.Action=="game_control"&&CodexChat.S(story,"plan_id")=="ai-"+t.Id))card.SetExecution(story);};
   aiPanel.TheaterEnded=async task=>{if(task.Thread!=chat.ThreadId)return;pendingTheaterCapture=null;pendingTheaterThread=null;if(busy&&task.TurnId==(currentRequestTurnId??chat.TurnId))await chat.Interrupt(false);};aiPanel.TheaterJudge=JudgeTheater;aiPanel.TheaterConfirm=ConfirmTheater;aiPanel.CanJudgeTheater=CanJudgeTheater;
@@ -277,16 +277,25 @@ internal sealed class WorkspaceHome : IDisposable {
   foreach(var entry in entries){string id=CodexChat.S(entry,"id"),title=HistoryTitle(entry);if(string.IsNullOrWhiteSpace(title))title=Locale.T("대화");var button=PanelUi.Button("",false);button.Content=new TextBlock{Text=title,TextTrimming=TextTrimming.CharacterEllipsis};button.Height=44;button.Margin=new Thickness(0,0,0,6);button.Background=id==chat.ThreadId?new SolidColorBrush(Color.FromRgb(53,64,71)):new SolidColorBrush(Color.FromRgb(35,38,44));button.HorizontalContentAlignment=HorizontalAlignment.Left;button.HorizontalAlignment=HorizontalAlignment.Stretch;button.ToolTip=title;button.IsEnabled=!busy;button.Click+=async(s,e)=>await Resume(id);var actions=PanelUi.Menu();var archive=new MenuItem{Header=Locale.T("대화 보관")};archive.Click+=async(s,e)=>{try{int navigation=conversationRequest;bool reset=await chat.Archive(id);if(reset&&navigation==conversationRequest&&chat.ThreadId==null)NewConversation();else RenderHistory(chat.CachedHistory());}catch(Exception error){MessageBox.Show(window,error.Message,"Catheryne");}};actions.Items.Add(archive);button.ContextMenu=actions;historyList.Children.Add(button);}
  }
 
- void ApplyConnection(){aiPanel.UpdateAccount();PanelUi.InputHint(draft,chat.Connected?Locale.T("메시지를 입력하세요."):connectionHint??Locale.T("ChatGPT에 로그인하세요."));draft.IsEnabled=chat.Connected&&!resuming;send.IsEnabled=!resuming&&!connecting;send.ToolTip=Locale.T(chat.Connected?"보내기":"ChatGPT 로그인");aiPanel.ModelButton.Visibility=chat.Connected?Visibility.Visible:Visibility.Hidden;aiPanel.Usage.Visibility=aiPanel.ModelButton.Visibility;}
+ void ApplyConnection(){aiPanel.UpdateAccount();PanelUi.InputHint(draft,chat.Connected?Locale.T("메시지를 입력하세요."):connectionHint??Locale.Format("{0}에 로그인하세요.",chat.ProviderName));draft.IsEnabled=chat.Connected&&!resuming&&!switchingProvider;send.IsEnabled=!resuming&&!connecting&&!switchingProvider;send.ToolTip=chat.Connected?Locale.T("보내기"):Locale.Format("{0} 로그인",chat.ProviderName);aiPanel.ModelButton.Visibility=chat.Connected?Visibility.Visible:Visibility.Hidden;aiPanel.Usage.Visibility=aiPanel.ModelButton.Visibility;}
+ async System.Threading.Tasks.Task SelectProvider(string provider){
+  if(provider==chat.Provider)return;if(busy||connecting||resuming||switchingProvider)throw new InvalidOperationException(Locale.T("진행 중인 작업이 끝난 뒤 AI를 변경해 주세요."));
+  switchingProvider=true;++connectionVersion;aiPanel.SetBusy(true);ApplyConnection();
+  try{await chat.SelectProvider(provider);CancelEdit();CancelResume();RenderConversation(new Dictionary<string,object>(),new List<AiTaskRecord>());AppPreferences.Set("aiProvider",provider);aiPanel.ResetUsage();await CheckConnection();}
+  finally{switchingProvider=false;aiPanel.SetBusy(busy);ApplyConnection();}
+ }
+ async System.Threading.Tasks.Task ConnectProvider(string provider){await SelectProvider(provider);await Connect();}
  public void Dispose(){typingClock.Stop();activityClock.Stop();ClearQuestions();aiPanel.Dispose();chat.Dispose();}
  async System.Threading.Tasks.Task CheckConnection(){
+  int version=++connectionVersion;
   connectionHint=Locale.T("연결 확인 중…");ApplyConnection();
-  try{await chat.Account();connectionHint=null;draft.ToolTip=null;ApplyConnection();if(chat.Connected){await aiPanel.LoadModels();await chat.EnsureProject();var warm=chat.History();}}
-  catch(Exception error){AppDiagnostics.Record(DiagnosticEvent.AiConnectionFailure,error);connectionHint=Locale.T("연결 다시 시도");draft.ToolTip=error.Message;ApplyConnection();}
+  try{await chat.Account();if(version!=connectionVersion)return;connectionHint=null;draft.ToolTip=null;ApplyConnection();if(chat.Connected){await aiPanel.LoadModels();if(version!=connectionVersion)return;await chat.EnsureProject();if(version==connectionVersion){var warm=chat.History();}}}
+  catch(Exception error){if(version!=connectionVersion)return;AppDiagnostics.Record(DiagnosticEvent.AiConnectionFailure,error);connectionHint=error.Message;draft.ToolTip=error.Message;ApplyConnection();}
  }
- async void Connection(){
+ async void Connection(){await AccountConnections.For(window).Connect(chat.Provider);}
+ async System.Threading.Tasks.Task Connect(){
   if(connecting)return;connecting=true;connectionHint=Locale.T("연결 확인 중…");ApplyConnection();
-  try{if(await chat.Account()){connectionHint=null;ApplyConnection();await aiPanel.LoadModels();return;}await chat.Login();connectionHint=Locale.T("로그인 대기 중");ApplyConnection();}
+  try{bool connected=false;try{connected=await chat.Account();}catch(ClaudeAccountRequired){}if(connected){connectionHint=null;ApplyConnection();await aiPanel.LoadModels();return;}connectionHint=Locale.T("로그인 대기 중");ApplyConnection();await chat.Login();if(chat.Provider==AiProviders.Claude)await CheckConnection();}
   catch(Exception error){connectionHint=Locale.T("연결 다시 시도");draft.ToolTip=error.Message;ApplyConnection();MessageBox.Show(window,error.Message,"Catheryne");}
   finally{connecting=false;ApplyConnection();}
  }
@@ -402,7 +411,7 @@ internal sealed class WorkspaceHome : IDisposable {
   string[] files=selectedFiles.ToArray();
   try{
    var input=CodexChat.PrepareInput(text,files);
-   if(!await chat.Account())throw new InvalidOperationException(Locale.T("먼저 ChatGPT에 로그인해 주세요."));
+   if(!await chat.Account())throw new InvalidOperationException(Locale.Format("먼저 {0}에 로그인해 주세요.",chat.ProviderName));
    if(editingRequest!=null){var original=editingRequest;try{var fork=await chat.ForkInterrupted(original);loadingHistory=true;RenderConversation(fork,new List<AiTaskRecord>());}catch{if(chat.ThreadId!=original.Thread)RenderConversation(new Dictionary<string,object>(),new List<AiTaskRecord>());throw;}finally{loadingHistory=false;if(chat.ThreadId!=original.Thread)EndEdit();}}
    ClearEditAction();UserMessage(input);BeginActivity();draft.Clear();await chat.Send(input);selectedFiles.Clear();attachments.Children.Clear();
   }catch(OperationCanceledException){if(request!=sendingRequest)return;draft.Text=text;SetActivity(Locale.T("중단됨"));Finish(true);}
@@ -480,6 +489,7 @@ internal sealed class WorkspaceHome : IDisposable {
  internal event Action<AiTaskRecord> TaskUpdated;
  async System.Threading.Tasks.Task<bool> Resume(string id){
   if(busy)return false;
+  Guid session;if(Guid.TryParse(id,out session)){string provider=await System.Threading.Tasks.Task.Run(()=>System.IO.File.Exists(System.IO.Path.Combine(Setup.DataFolder,"ai-workspace","claude",session.ToString()+".json"))?AiProviders.Claude:AiProviders.Codex);if(provider!=chat.Provider)await SelectProvider(provider);}
   CancelEdit();int request=++conversationRequest;resuming=true;ApplyConnection();
   try{
    currentRequestTurnId=null;loadingHistory=true;pendingText.Clear();typingClock.Stop();var thread=await chat.ReadConversation(id);if(request!=conversationRequest)return false;

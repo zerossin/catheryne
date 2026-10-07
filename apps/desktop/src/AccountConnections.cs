@@ -12,14 +12,14 @@ using Microsoft.Web.WebView2.Wpf;
 internal sealed class AccountConnections {
  static readonly ConditionalWeakTable<Window,AccountConnections> instances=new ConditionalWeakTable<Window,AccountConnections>();
  internal static AccountConnections For(Window window){return instances.GetValue(window,w=>new AccountConnections(w));}
- internal static readonly string[] Providers={"chatgpt","hoyolab","redemption"};
- internal static string Name(string provider){return provider=="chatgpt"?"ChatGPT":provider=="hoyolab"?"HoYoLAB":Locale.T("리딤 계정");}
+ internal static readonly string[] Providers={"chatgpt","claude","hoyolab","redemption"};
+ internal static string Name(string provider){return provider=="chatgpt"?"ChatGPT":provider=="claude"?"Claude":provider=="hoyolab"?"HoYoLAB":Locale.T("리딤 계정");}
  readonly Window owner;Window login;TaskCompletionSource<bool> completion;
- internal Func<bool> ChatConnected;internal Action ChatLogin;internal Func<Task> ChatLogout;
+ internal Func<string,bool> ChatConnected;internal Func<string,Task> ChatLogin;internal Func<string,Task> ChatLogout;
  internal event Action Changed;
  AccountConnections(Window owner){this.owner=owner;}
- internal bool Connected(string provider){if(!Providers.Contains(provider))throw new ArgumentException("Unknown account provider");if(provider=="chatgpt")return ChatConnected!=null&&ChatConnected();if(provider=="redemption")return new RedemptionService(Setup.DataFolder).Account()!=null;using(var db=new LocalDataService(Setup.DataFolder))return !string.IsNullOrWhiteSpace(db.GetSecret("hoyolab"));}
- internal async Task Disconnect(string provider){if(provider=="chatgpt"){if(ChatLogout==null)throw new InvalidOperationException(Locale.T("ChatGPT 연결을 확인해 주세요."));await ChatLogout();}else if(provider=="hoyolab")DailySettings.Disconnect(Setup.DataFolder);else if(provider=="redemption")new RedemptionService(Setup.DataFolder).Disconnect();else throw new ArgumentException("Unknown disconnect provider");if(Changed!=null)Changed();}
+ internal bool Connected(string provider){if(!Providers.Contains(provider))throw new ArgumentException("Unknown account provider");if(AiProviders.IsChat(provider))return ChatConnected!=null&&ChatConnected(provider);if(provider=="redemption")return new RedemptionService(Setup.DataFolder).Account()!=null;using(var db=new LocalDataService(Setup.DataFolder))return !string.IsNullOrWhiteSpace(db.GetSecret("hoyolab"));}
+ internal async Task Disconnect(string provider){if(AiProviders.IsChat(provider)){if(ChatLogout==null)throw new InvalidOperationException(Locale.Format("{0} 연결을 확인해 주세요.",Name(provider)));await ChatLogout(provider);}else if(provider=="hoyolab")DailySettings.Disconnect(Setup.DataFolder);else if(provider=="redemption")new RedemptionService(Setup.DataFolder).Disconnect();else throw new ArgumentException("Unknown disconnect provider");if(Changed!=null)Changed();}
  internal async Task<bool> Ensure(string provider,bool reconnect=false){
   if(!reconnect&&Connected(provider))return true;
   if(MessageBox.Show(owner,Locale.Format("{0} 계정이 연결되어 있지 않습니다. 연결하시겠습니까?",Name(provider)),Locale.T("계정 연결"),MessageBoxButton.YesNo,MessageBoxImage.Question)!=MessageBoxResult.Yes)return false;
@@ -28,7 +28,11 @@ internal sealed class AccountConnections {
  sealed class Choice {internal string Uid,Server,Nickname;internal RedeemAccount Redemption;public override string ToString(){return Nickname+"  "+Uid+"  "+Server;}}
  internal async Task<bool> Connect(string provider){
   if(!Providers.Contains(provider))throw new ArgumentException("Unknown account provider");
-  if(provider=="chatgpt"){if(ChatLogin!=null)ChatLogin();return Connected(provider);}
+  if(completion!=null&&!completion.Task.IsCompleted){if(login!=null)login.Activate();await completion.Task;return Connected(provider);}
+  if(AiProviders.IsChat(provider)){
+   var doneChat=new TaskCompletionSource<bool>();completion=doneChat;
+   try{if(ChatLogin!=null)await ChatLogin(provider);if(Changed!=null)Changed();return Connected(provider);}finally{doneChat.TrySetResult(Connected(provider));}
+  }
   if(login!=null){login.Activate();await completion.Task;return Connected(provider);}
   bool redemption=provider=="redemption",accepted=false;var done=new TaskCompletionSource<bool>();completion=done;
   var popup=new Window{Title=Name(provider),Width=1000,Height=760,Owner=owner,Background=new System.Windows.Media.SolidColorBrush(System.Windows.Media.Color.FromRgb(23,25,29))};login=popup;

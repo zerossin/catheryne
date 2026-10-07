@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
@@ -24,6 +24,8 @@ internal static class Entry {
   AppDomain.CurrentDomain.UnhandledException+=(s,e)=>AppDiagnostics.Record(DiagnosticEvent.UnhandledFailure,e.ExceptionObject as Exception);
   TaskScheduler.UnobservedTaskException+=(s,e)=>AppDiagnostics.Record(DiagnosticEvent.UnhandledFailure,e.Exception);
   try{
+   if(args.Length==2&&args[0]=="--ai-mcp-bridge")return ClaudeMcpBridge.Run(args[1]);
+   if(args.Length>0&&args[0]=="--claude-provider-fixture")return ClaudeProviderTests.Fixture(args.Skip(1).ToArray());
    if(args.Contains("--notification-server")){if(!AppNotifications.IsActivationServer(args))return 1;string link=AppNotifications.AwaitActivation();if(link==null)return 0;args=new[]{"--preview","--notification",link};}
    if(args.Contains("--notification")){if(args.Length!=3||args[0]!="--preview"||args[1]!="--notification")return 1;NotificationTarget.Parse(args[2]);}
    if(args.Length==4&&args[0]=="--game-environment-host"&&new[]{"automatic","interactive"}.Contains(args[3]))return GameEnvironment.Host(args[1],int.Parse(args[2]),args[3]=="interactive");
@@ -373,21 +375,21 @@ internal sealed class Launcher : IDisposable {
 internal static class Tests {
  internal static int Run(string language="ko-KR") {
   // All automated paths, including AI actions, use fake HDR state; never toggle the user's display.
-  bool? testAutoHdr=true;WindowsAutoHdr.TestBackend=(write,enabled)=>{if(write)testAutoHdr=enabled;return new WindowsAutoHdrState{Supported=true,Enabled=testAutoHdr};};WindowsAutoHdr.Test();
+  bool? testAutoHdr=true;WindowsAutoHdr.TestBackend=(write,enabled)=>{if(write)testAutoHdr=enabled;return new WindowsAutoHdrState{Supported=true,Enabled=testAutoHdr};};
   var testHdr=new Dictionary<int,bool>();WindowsHdr.TestBackend=(monitor,enabled,expected)=>{string identity="selftest-"+monitor;if(expected!=null&&expected!=identity)throw new InvalidOperationException("Fixture monitor changed");if(!testHdr.ContainsKey(monitor))testHdr[monitor]=true;if(enabled.HasValue)testHdr[monitor]=enabled.Value;return new WindowsHdrState{Monitor=monitor,Identity=identity,Supported=true,Enabled=testHdr[monitor]};};
   // Offscreen WPF fixtures need a deterministic compositor; production keeps its renderer.
   RenderOptions.ProcessRenderMode=System.Windows.Interop.RenderMode.SoftwareOnly;
   string priorData=Environment.GetEnvironmentVariable("CATHERYNE_TOOL_DATA");string testData=Path.Combine(Path.GetTempPath(),"catheryne-selftest-"+Guid.NewGuid().ToString("N"));Environment.SetEnvironmentVariable("CATHERYNE_TOOL_DATA",testData);
   string path=Path.Combine(Path.GetTempPath(),"genshin-launcher-test-"+Guid.NewGuid()+".json");
   try {
-   Directory.CreateDirectory(testData);File.WriteAllText(Path.Combine(testData,"settings.json"),CatheryneTools.Json().Serialize(new{language=language}));LocalizationTests.Run();
+   Directory.CreateDirectory(testData);File.WriteAllText(Path.Combine(testData,"settings.json"),CatheryneTools.Json().Serialize(new{language=language}));if(Locale.LanguageCode!=language)throw new Exception("Self-test locale was initialized outside its isolated fixture");WindowsAutoHdr.Test();LocalizationTests.Run();
    File.WriteAllText(path,"{\"FPSTarget\":120,\"AutoStart\":true,\"AutoClose\":true,\"Fullscreen\":true,\"UnknownFutureField\":{\"value\":42},\"DllList\":[]}");
    File.SetAttributes(path,FileAttributes.Hidden);
    var store=new ConfigStore(path);store.Save(UnlockerOptions.Defaults());
    var c=store.Read();if(!c.ContainsKey("UnknownFutureField") || !(bool)c["AutoStart"] || (int)c["FPSTarget"]!=120) throw new Exception("Roundtrip failed");
    if((File.GetAttributes(path)&FileAttributes.Hidden)==0)throw new Exception("Hidden attribute lost");
    bool rejected=false;try{store.Save(new Dictionary<string,object>{{"FPSTarget",0}});}catch(ArgumentException){rejected=true;}if(!rejected)throw new Exception("Invalid FPS accepted");
-   AiPersistenceTests.Run();NotificationTests.Run();ArtifactReviewTests.Run();AppUpdateTests.Run();AppUpdateServiceTests.Run();GameDataTests.Run();UiConsistencyTests.Run();DiagnosticsTests.Run();PerformanceTests.Run();SharedReadTests.Run();RuntimePerformanceTests.Run();UiReadTests.Run();EndgameTests.Run();TheaterTests.Run();CaptureTests.Run();ModManagerTests.Run();PanelInteractionTests.Run();HoyoAccountTests.Run();MaterialInventoryTests.Run();CollectionHistoryTests.Run();ChatAttachmentTests.Run();PrimogemTests.Run();RedemptionTests.Run();AiToolTests.Run();ServiceTests.Run();LocalDataTests.Run();ComponentTests.Run();GoalPlanningTests.Run();
+   AiPersistenceTests.Run();ClaudeProviderTests.Run();NotificationTests.Run();ArtifactReviewTests.Run();AppUpdateTests.Run();AppUpdateServiceTests.Run();GameDataTests.Run();UiConsistencyTests.Run();DiagnosticsTests.Run();PerformanceTests.Run();SharedReadTests.Run();RuntimePerformanceTests.Run();UiReadTests.Run();EndgameTests.Run();TheaterTests.Run();CaptureTests.Run();ModManagerTests.Run();PanelInteractionTests.Run();HoyoAccountTests.Run();MaterialInventoryTests.Run();CollectionHistoryTests.Run();ChatAttachmentTests.Run();PrimogemTests.Run();RedemptionTests.Run();AiToolTests.Run();ServiceTests.Run();LocalDataTests.Run();ComponentTests.Run();GoalPlanningTests.Run();
    string profileRoot=Path.Combine(Path.GetTempPath(),"companion-profile-test-"+Guid.NewGuid().ToString("N"));
    Directory.CreateDirectory(profileRoot);
    try {
@@ -514,7 +516,7 @@ internal static class Tests {
     if(((Button)shell.Window.FindName("Play")).IsEnabled)throw new Exception("Game start enabled before setup");
     shell.Window.Close();
    }
-   File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-result.txt"),"PASS: all editable option roundtrips, metadata preservation, invalid input rejection, x64 DLL checks, UI window-mode/resolution dependencies, first-run shell; config roundtrip, hidden attributes, FPS validation; channel-only switch and rollback, version preservation, missing/duplicate fields, busy guards; update URL/hash checks, check-only, corrupt download cleanup, locked engine preservation, atomic replacement, backup, downgrade prevention");return 0;
+   File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-result.txt"),"PASS: fake Claude CLI/MCP auth, streaming, tools, stop and history; all editable option roundtrips, metadata preservation, invalid input rejection, x64 DLL checks, UI window-mode/resolution dependencies, first-run shell; config roundtrip, hidden attributes, FPS validation; channel-only switch and rollback, version preservation, missing/duplicate fields, busy guards; update URL/hash checks, check-only, corrupt download cleanup, locked engine preservation, atomic replacement, backup, downgrade prevention");return 0;
   }catch(Exception e){File.WriteAllText(Path.Combine(AppDomain.CurrentDomain.BaseDirectory,"test-result.txt"),"FAIL: "+e);return 1;}
   finally{Environment.SetEnvironmentVariable("CATHERYNE_TOOL_DATA",priorData);if(Directory.Exists(testData))Directory.Delete(testData,true);if(File.Exists(path)){File.SetAttributes(path,FileAttributes.Normal);File.Delete(path);}}
  }

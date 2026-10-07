@@ -168,6 +168,10 @@ GameEnvironment.cs
 GameEnvironmentOperations.cs
 GameEnvironmentPanel.cs
 AiExecutionPolicy.cs
+AiProvider.cs
+ClaudeProvider.cs
+ClaudeMcpBridge.cs
+ClaudeProviderTests.cs
 AiUserInput.cs
 AiQuestionCard.cs
 AiPersistenceTests.cs

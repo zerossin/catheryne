@@ -9,7 +9,8 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Web.Script.Serialization;
 
-// Official app-server transport. Credentials and conversation bodies remain owned by Codex.
+// Shared chat host; the historical class name is retained for existing clients.
+// Codex uses app-server; other providers adapt only the wire/session contract.
 internal sealed class CodexChat : IDisposable {
  internal const int ToolContractVersion=11;
  internal readonly AiInputInbox Questions=new AiInputInbox();
@@ -20,10 +21,27 @@ internal sealed class CodexChat : IDisposable {
  readonly SemaphoreSlim startup=new SemaphoreSlim(1,1);
  Process process;StreamWriter input;Task readerTask,errorTask;int sequence;bool ready,disposed,restarting,threadLoaded;string transportError;
  internal event Action<string,Dictionary<string,object>> Notification;
- internal readonly string Workspace; readonly string dataRoot;readonly Func<Task<string>> findRuntime;readonly Action<object> sendWire;
- internal CodexChat(string root=null,Func<Task<string>> findRuntime=null,Action<object> sendWire=null){this.sendWire=sendWire;dataRoot=root??Setup.DataFolder;Workspace=Path.Combine(dataRoot,"ai-workspace");this.findRuntime=findRuntime??(()=>Task.Run(()=>Find()));}
+ internal string Workspace {get{return Provider==AiProviders.Claude?Path.Combine(dataRoot,"ai-workspace","claude"):Path.Combine(dataRoot,"ai-workspace");}} readonly string dataRoot;readonly Func<Task<string>> findRuntime;readonly Action<object> sendWire;
+ internal CodexChat(string root=null,Func<Task<string>> findRuntime=null,Action<object> sendWire=null){Provider=AiProviders.Codex;this.sendWire=sendWire;dataRoot=root??Setup.DataFolder;this.findRuntime=findRuntime??(()=>Task.Run(()=>Find()));}
  internal string ThreadId,TurnId,Model,Effort;
  internal string ProjectId;
+ internal string Provider {get;private set;}
+ internal string ProviderName {get{return AccountConnections.Name(Provider);}}
+ IAiProvider providerTransport;
+ readonly Dictionary<string,bool> connectedProviders=new Dictionary<string,bool>();
+ internal bool ProviderConnected(string provider){bool connected;return provider==Provider?Connected:connectedProviders.TryGetValue(provider,out connected)&&connected;}
+ internal async Task SelectProvider(string provider){
+  if(!AiProviders.IsChat(provider))throw new ArgumentException("Unknown chat provider");if(provider==Provider)return;
+  if(TurnId!=null||await Task.Run(()=>new AiTaskStore(dataRoot).List().Any(t=>t.State=="running"&&(t.Action=="game_control"||t.Action=="scanner"||t.Thread==ThreadId))))throw new InvalidOperationException(Locale.T("진행 중인 작업이 끝난 뒤 AI를 변경해 주세요."));
+  connectedProviders[Provider]=Connected;await toolGate.WaitAsync();try{await CloseTransport();if(providerTransport!=null){providerTransport.Dispose();providerTransport=null;}}finally{toolGate.Release();}
+  New();Provider=provider;Connected=false;ProjectId=null;Model=null;Effort=null;historyCache=null;historyLoading=null;historyFetched=DateTime.MinValue;
+  if(provider==AiProviders.Claude)providerTransport=new ClaudeProvider(dataRoot,ProviderNotification,ExecuteTool);
+ }
+ void ProviderNotification(string name,Dictionary<string,object> data){
+  if(name=="turn/started"&&S(data,"threadId")==ThreadId)TurnId=S(Map(data["turn"]),"id");
+  if(name=="turn/completed"&&S(data,"threadId")==ThreadId){ClearInputs(ThreadId,TurnId);TurnId=null;}
+  Emit(name,data);
+ }
  readonly SemaphoreSlim projectGate=new SemaphoreSlim(1,1);
  internal int ToolCalls;
  readonly SemaphoreSlim toolGate=new SemaphoreSlim(1,1);
@@ -76,6 +94,7 @@ internal sealed class CodexChat : IDisposable {
   restarting=true;try{if(process!=null){await Task.Run(()=>{try{if(!process.HasExited){input.Close();if(!process.WaitForExit(1000))process.Kill();}}catch{}});if(readerTask!=null)await readerTask;if(errorTask!=null)await errorTask;process.Dispose();process=null;}}finally{ready=false;threadLoaded=false;TurnId=null;restarting=false;}
  }
  internal async Task Start(){
+  if(providerTransport!=null){if(disposed)throw new ObjectDisposedException("CodexChat");await providerTransport.Start();ready=true;return;}
   await startup.WaitAsync();try{
    if(ready&&process!=null&&!process.HasExited){
     if(TurnId!=null)return;
@@ -95,6 +114,7 @@ internal sealed class CodexChat : IDisposable {
  }
  void Write(object message){if(sendWire!=null){sendWire(message);return;}lock(writeGate){if(process==null||process.HasExited)throw new IOException("AI 연결이 종료되었습니다.");input.WriteLine(Json().Serialize(message));}}
  internal async Task<Dictionary<string,object>> Call(string method,object args){
+  if(providerTransport!=null)return await providerTransport.Call(method,Map(Json().DeserializeObject(Json().Serialize(args))));
   int id=Interlocked.Increment(ref sequence);var completion=new TaskCompletionSource<Dictionary<string,object>>(TaskCreationOptions.RunContinuationsAsynchronously);
   lock(gate)pending[id]=completion;
   try{Write(new{id=id,method=method,@params=args});if(await Task.WhenAny(completion.Task,Task.Delay(45000))!=completion.Task)throw new TimeoutException("AI 연결 응답 시간이 초과되었습니다.");return await completion.Task;}
@@ -153,18 +173,19 @@ internal sealed class CodexChat : IDisposable {
  void Emit(string name,Dictionary<string,object> data){if(disposed)return;try{RecordMessageTime(name,data);}catch(IOException){}var handler=Notification;if(handler!=null)handler(name,data);}
  internal int ImageResults {get;private set;}
  internal static object[] ToolContent(object result){var map=result as Dictionary<string,object>;if(map!=null&&map.ContainsKey("image_url")){var metadata=new Dictionary<string,object>(map);string image=S(metadata,"image_url");metadata.Remove("image_url");return new object[]{new{type="inputText",text=Json().Serialize(metadata)},new{type="inputImage",imageUrl=image}};}return new object[]{new{type="inputText",text=Json().Serialize(result)}};}
- async Task HandleTool(object id,Dictionary<string,object> data){
+ internal async Task<object> ExecuteTool(string name,Dictionary<string,object> args,string thread,string turn,string call){
   await toolGate.WaitAsync();try{
-   if(stoppedByUser||S(data,"threadId")!=ThreadId||S(data,"turnId")!=TurnId)throw new InvalidOperationException("Inactive conversation; no action authorized");
-   object raw;var args=data.TryGetValue("arguments",out raw)?Map(raw):new Dictionary<string,object>();
-   if(raw is string)args=Json().Deserialize<Dictionary<string,object>>((string)raw);
-   Emit("item/started",new Dictionary<string,object>{{"item",new Dictionary<string,object>{{"type","dynamicToolCall"},{"tool",S(data,"tool")}}}});
-   ToolCalls++;var result=await Task.Run(()=>new CatheryneTools(dataRoot).Run(S(data,"tool"),args,S(data,"threadId"),S(data,"callId"),t=>{if(string.IsNullOrEmpty(t.TurnId)||t.Action=="theater"){t.TurnId=S(data,"turnId");new AiTaskStore(dataRoot).Save(t);}Emit("catheryne/task",Map(Json().DeserializeObject(Json().Serialize(t))));},S(data,"turnId")));
+   if(disposed||stoppedByUser||thread!=ThreadId||turn!=TurnId||string.IsNullOrEmpty(turn))throw new InvalidOperationException("Inactive conversation; no action authorized");
+   ToolCalls++;var result=await Task.Run(()=>new CatheryneTools(dataRoot).Run(name,args,thread,call,t=>{if(string.IsNullOrEmpty(t.TurnId)||t.Action=="theater"){t.TurnId=turn;new AiTaskStore(dataRoot).Save(t);}Emit("catheryne/task",Map(Json().DeserializeObject(Json().Serialize(t))));},turn));
    if(result is Dictionary<string,object>&&((Dictionary<string,object>)result).ContainsKey("image_url"))ImageResults++;
-   Write(new{id=id,result=new{contentItems=ToolContent(result),success=true}});
-
-  }catch(Exception error){Write(new{id=id,result=new{contentItems=new[]{new{type="inputText",text=Json().Serialize(CatheryneTools.Failure(error))}},success=false}});}
+   return result;
+  }
   finally{toolGate.Release();}
+ }
+ async Task HandleTool(object id,Dictionary<string,object> data){
+  try{object raw;var args=data.TryGetValue("arguments",out raw)?Map(raw):new Dictionary<string,object>();if(raw is string)args=Json().Deserialize<Dictionary<string,object>>((string)raw);
+   var result=await ExecuteTool(S(data,"tool"),args,S(data,"threadId"),S(data,"turnId"),S(data,"callId"));Write(new{id=id,result=new{contentItems=ToolContent(result),success=true}});
+  }catch(Exception error){Write(new{id=id,result=new{contentItems=new[]{new{type="inputText",text=Json().Serialize(CatheryneTools.Failure(error))}},success=false}});}
  }
  internal async Task<bool> Archive(string id){
   if(string.IsNullOrEmpty(id))return false;
@@ -178,9 +199,9 @@ internal sealed class CodexChat : IDisposable {
   return reset;
  }
  internal async Task<List<Dictionary<string,object>>> Models(){await Start();var result=await Call("model/list",new{limit=100,includeHidden=false});return Items(result["data"]).ToList();}
- internal async Task<bool> Account(){await Start();var result=await Call("account/read",new{refreshToken=false});Connected=result.ContainsKey("account")&&result["account"]!=null;return Connected;}
+ internal async Task<bool> Account(){string provider=Provider;await Start();if(provider!=Provider)throw new OperationCanceledException();var result=await Call("account/read",new{refreshToken=false});if(provider!=Provider)throw new OperationCanceledException();Connected=result.ContainsKey("account")&&result["account"]!=null;connectedProviders[Provider]=Connected;return Connected;}
  internal async Task Logout(){await Start();await Call("account/logout",null);Connected=false;Emit("account/updated",new Dictionary<string,object>());}
- internal async Task Login(){await Start();var result=await Call("account/login/start",new{type="chatgpt"});string url=S(result,"authUrl");Uri address;if(!Uri.TryCreate(url,UriKind.Absolute,out address)||address.Scheme!="https"||(address.Host!="auth.openai.com"&&address.Host!="chatgpt.com"))throw new InvalidOperationException("공식 로그인 주소를 확인하지 못했습니다.");Process.Start(new ProcessStartInfo(url){UseShellExecute=true});}
+ internal async Task Login(){await Start();if(providerTransport!=null){await providerTransport.Login();await Account();Emit("account/login/completed",new Dictionary<string,object>());return;}var result=await Call("account/login/start",new{type="chatgpt"});string url=S(result,"authUrl");if(!AiProviders.LoginAddress(url,Provider))throw new InvalidOperationException(Locale.T("공식 로그인 주소를 확인하지 못했습니다."));Process.Start(new ProcessStartInfo(url){UseShellExecute=true});}
  async Task<Dictionary<string,object>> FindProject(){
    var all=new List<Dictionary<string,object>>();string cursor=null;
    do{var page=await Call("project/list",new{limit=100,cursor=cursor});all.AddRange(Items(page["data"]));cursor=S(page,"nextCursor");}while(!string.IsNullOrEmpty(cursor));
@@ -245,7 +266,7 @@ internal sealed class CodexChat : IDisposable {
  }
  internal async Task<Dictionary<string,object>> ForkInterrupted(InterruptedRequest request){
   var latest=await CheckInterrupted(request.Thread,request.Turn);if(latest.PreviousTurn!=request.PreviousTurn)throw new InvalidOperationException(Locale.T("현재 대화를 다시 확인해 주세요."));
-  if(!await Account())throw new InvalidOperationException(Locale.T("먼저 ChatGPT에 로그인해 주세요."));await EnsureProject();latest=await CheckInterrupted(request.Thread,request.Turn);if(latest.PreviousTurn!=request.PreviousTurn)throw new InvalidOperationException(Locale.T("현재 대화를 다시 확인해 주세요."));
+  if(!await Account())throw new InvalidOperationException(Locale.Format("먼저 {0}에 로그인해 주세요.",ProviderName));await EnsureProject();latest=await CheckInterrupted(request.Thread,request.Turn);if(latest.PreviousTurn!=request.PreviousTurn)throw new InvalidOperationException(Locale.T("현재 대화를 다시 확인해 주세요."));
   bool currentContract=CurrentContract(request.Thread);string fork;
   if(request.PreviousTurn==null){var started=await StartThread();fork=S(Map(started["thread"]),"id");}
   else{var result=await Call("thread/fork",new{config=AiExecutionPolicy.RuntimeConfig(),threadId=request.Thread,lastTurnId=request.PreviousTurn,excludeTurns=true,cwd=Workspace,approvalPolicy="never",sandbox="read-only",developerInstructions=CurrentInstructions(),model=Model});fork=S(Map(result["thread"]),"id");}
@@ -256,12 +277,12 @@ internal sealed class CodexChat : IDisposable {
   try{ChatAttachments.Inherit(dataRoot,request.Thread,fork);}catch(Exception){Emit("client/notice",new Dictionary<string,object>{{"message",Locale.T("이미지 기록을 보관하지 못했습니다.")}});}
   return await ReadConversation(fork);
  }
- Task<Dictionary<string,object>> StartThread(){return Call("thread/start",new{config=AiExecutionPolicy.RuntimeConfig(),projectId=ProjectId,cwd=Workspace,approvalPolicy="never",sandbox="read-only",developerInstructions=CurrentInstructions(),dynamicTools=CatheryneTools.Definitions(),model=Model});}
+ Task<Dictionary<string,object>> StartThread(){return Call("thread/start",new{config=AiExecutionPolicy.RuntimeConfig(),projectId=ProjectId,cwd=Workspace,approvalPolicy="never",sandbox="read-only",developerInstructions=AiProviders.Instructions(Provider),dynamicTools=CatheryneTools.Definitions(),model=Model});}
  internal Task Send(string text,string[] files){return Send(PrepareInput(text,files));}
  void CheckSend(int epoch){if(stoppedByUser||epoch!=Volatile.Read(ref sendEpoch))throw new OperationCanceledException();}
  internal async Task Send(object[] inputs){
   int epoch=Interlocked.Increment(ref sendEpoch);stoppedByUser=false;
-  if(!await Account())throw new InvalidOperationException("먼저 ChatGPT에 로그인해 주세요.");
+  if(!await Account())throw new InvalidOperationException(Locale.Format("먼저 {0}에 로그인해 주세요.",ProviderName));
   CheckSend(epoch);await EnsureProject();CheckSend(epoch);
   if(ThreadId!=null&&!threadLoaded)await LoadThread(ThreadId);CheckSend(epoch);
   // A new human message never silently resumes an old paused objective.
@@ -291,8 +312,8 @@ internal sealed class CodexChat : IDisposable {
   await Start();bool current=CurrentContract(id);
   // Resume is history/navigation, not permission to restart stored game work.
   var goal=await Call("thread/goal/get",new{threadId=id});Goal=Map(goal.ContainsKey("goal")?goal["goal"]:null);if(S(Goal,"status")=="active"){await Call("thread/goal/set",new{threadId=id,status="paused"});var paused=new Dictionary<string,object>(Goal);paused["status"]="paused";Goal=paused;}
-  var args=new Dictionary<string,object>{{"config",AiExecutionPolicy.RuntimeConfig()},{"threadId",id},{"excludeTurns",true},{"cwd",Workspace},{"approvalPolicy","never"},{"sandbox","read-only"},{"developerInstructions",CurrentInstructions()},{"model",Model}};
-  if(!current){
+  var args=new Dictionary<string,object>{{"config",AiExecutionPolicy.RuntimeConfig()},{"threadId",id},{"excludeTurns",true},{"cwd",Workspace},{"approvalPolicy","never"},{"sandbox","read-only"},{"developerInstructions",AiProviders.Instructions(Provider)},{"model",Model}};
+  if(!current&&Provider==AiProviders.Codex){
    AppRuntime.McpCommand();
    ((Dictionary<string,object>)args["config"])["mcp_servers.catheryne"]=new{command=System.Reflection.Assembly.GetExecutingAssembly().Location,args=new[]{"--mcp-server","--embedded"},required=true,default_tools_approval_mode="approve",enabled_tools=CatheryneTools.Definitions().Select(d=>S(Map(Json().DeserializeObject(Json().Serialize(d))),"name")).ToArray(),env=new Dictionary<string,string>{{"CATHERYNE_TOOL_DATA",dataRoot},{"CATHERYNE_THREAD",id}}};
   }
@@ -351,7 +372,7 @@ internal sealed class CodexChat : IDisposable {
  }
  internal void CancelResume(){++resumeVersion;}
  internal void New(){Interlocked.Increment(ref sendEpoch);stoppedByUser=true;var pause=PauseForNavigation();ClearInputs(ThreadId);Goal=new Dictionary<string,object>();CancelResume();ThreadId=null;TurnId=null;threadLoaded=false;}
- public void Dispose(){Process running;lock(gate){if(disposed)return;disposed=true;ready=false;Connected=false;running=process;}try{if(running!=null&&!running.HasExited){if(input!=null)input.Close();if(!running.WaitForExit(1000)){running.Kill();running.WaitForExit(2000);}}}catch(InvalidOperationException){}catch(Exception error){AppDiagnostics.Record(DiagnosticEvent.AiTransportFailure,error,dataRoot);}}
+ public void Dispose(){Process running;lock(gate){if(disposed)return;disposed=true;ready=false;Connected=false;running=process;}if(providerTransport!=null)providerTransport.Dispose();try{if(running!=null&&!running.HasExited){if(input!=null)input.Close();if(!running.WaitForExit(1000)){running.Kill();running.WaitForExit(2000);}}}catch(InvalidOperationException){}catch(Exception error){AppDiagnostics.Record(DiagnosticEvent.AiTransportFailure,error,dataRoot);}}
 
 
 

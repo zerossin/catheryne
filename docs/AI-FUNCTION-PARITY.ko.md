@@ -1,5 +1,26 @@
 # 기존 기능과 AI 연결 대조
 
+## Claude 계정 연결 (2026-10-07)
+
+계정 메뉴의 Claude 행 또는 모델 팝업의 공급자 선택으로 전환한다. Codex의 기존 계정 연결·대화는 보존한다. 공급자별 대화 목록과 모델 선택값은 구분하지만 도구 정의, 지침·실행 정책, 작업 저장소, 카드, 중단·관제 경로는 공유한다. 대화 응답 또는 관제·스캔 작업이 실행 중이면 공급자 변경을 거절한다. 작업 카드에서 과거 대화를 열 때 해당 공급자로 돌아간다. 계정 변경·공급자 전환을 통한 한도 우회를 자동 실행하거나 제안하지 않는다.
+
+공식 경로 조사 결과:
+
+- [CLI 참조](https://code.claude.com/docs/en/cli-reference)는 `auth login/logout/status`, `--print`, JSON 스트림, 세션 재개, MCP 설정과 도구 제한 플래그를 제공한다.
+- [Agent SDK 개요](https://code.claude.com/docs/en/agent-sdk/overview)는 Python·TypeScript SDK를 제공하며 다른 언어에서는 CLI 하위 프로세스 사용을 안내한다. C# 앱은 추가 SDK 런타임 없이 공식 CLI를 호출하는 방식을 선택했다. 이는 구현 선택이며 별도 OAuth 클라이언트나 Messages API에 구독 토큰을 전달하는 방식이 아니다.
+- 같은 SDK 문서는 사전 승인 없는 제3자 제품의 `claude.ai` 로그인 제공을 제한한다. 개인 로컬 사용과 배포 제품의 허용 범위를 동일하게 단정하지 않는다. 배포용 로그인 기능은 Anthropic의 승인을 확인해야 한다. 기술적으로 CLI가 실행된다는 사실은 배포 승인을 입증하지 않는다.
+- [구독 사용 안내](https://support.claude.com/en/articles/15036540-use-the-claude-agent-sdk-with-your-claude-plan)의 6월 15일 변경 보류 공지는 `claude -p`·SDK·제3자 앱 사용이 기존 구독 한도를 사용한다고 설명한다. 이는 사용량 안내이며 위 배포 제한을 해제하는 근거로 취급하지 않는다.
+
+`ClaudeProvider`는 CLI의 인증·세션·스트림을 기존 채팅 계약에 맞추는 연결부다. 설치된 공식 native `claude.exe`를 사용하며 보안 플래그가 제공되는 2.1.259 이상을 요구한다. 자격 증명은 CLI가 관리한다. 앱은 로그인 출력·인증 코드·토큰을 수집하거나 저장하지 않고 `auth status`의 연결 상태만 확인한다. 앱이 직접 여는 OAuth 주소는 허용 HTTPS 호스트만 통과하며, Claude 로그인 브라우저·콜백은 공식 CLI에 전적으로 위임한다. 상속된 API 키·OAuth 토큰·다른 구성 디렉터리·클라우드 공급자 변수를 제거하고 `claude.ai` 계정만 인정한다. 사용자 입력으로 API 키나 쿠키를 받지 않는다.
+
+모델 실행은 `--restricted --tools "" --strict-mcp-config`로 셸·파일 도구와 자동으로 발견한 사용자 설정·도구를 제한한다. 유일하게 연결한 Catheryne MCP의 호출은 사용자 전용 named pipe를 통해 GUI의 공통 `ExecuteTool`에 도달한다. 대화·턴 소유권과 사용자 중단을 다시 검사한 뒤 `CatheryneTools.Run`을 실행하므로 별도 게임 엔진을 만들지 않는다. 이미지 결과는 MCP 이미지 콘텐츠로 전달하고 메타데이터 텍스트에 base64를 넣지 않는다. 임시 지침 파일은 턴 종료 시 제거한다. 표시용 대화 기록은 개인 자료 폴더의 `ai-workspace/claude`에 저장하며 CLI 인증 파일은 읽지 않는다.
+
+사용자 가시 변화: Claude 로그인 행, 공급자 선택, 공급자별 로그인 힌트·오류, Sonnet/Opus/Haiku 모델 별칭, 한도 오류와 사용량 조회 불가 표시를 추가했다. CLI가 지원하는 모델의 실제 사용 가능 여부는 계정·CLI 응답에 따른다. 이 연결은 계정 한도/컨텍스트 수치를 추정하지 않으며 추론 단계 선택, Codex native goal·질문 카드, 중단된 요청의 수정본 fork는 제공하지 않는다. 필요한 질문은 채팅에서 받고 기존 Catheryne 작업으로 범위를 유지한다. Codex 기능은 그대로 유지한다.
+
+가짜 인증 응답·CLI 하위 프로세스·MCP 입력으로 성공/실패/중단, 스트림 중복 방지, 세션 재열기·목록·보관, 이미지 결과, 중단 후 호출 거절을 검사한다. 실제 로그인·유료 API·게임 입력은 자동 검증에 포함하지 않는다. 실제 Claude 계정 채팅 성공과 공식 승인 여부는 미검증이다.
+
+변경 파일은 연결부 `AiProvider.cs`, `ClaudeProvider.cs`, `ClaudeMcpBridge.cs`, 공통 채팅·정책 `CodexChat.cs`, `AiExecutionPolicy.cs`, 계정·UI `AccountConnections.cs`, `AiWorkspacePanel.cs`, `WorkspaceHome.cs`, 검증·진입점 `ClaudeProviderTests.cs`, `ChatLayoutTests.cs`, `Launcher.cs`(모두 `apps/desktop/src`), 빌드 목록 `apps/desktop/build-sources.txt`, 번역 `apps/desktop/en-US.json`, 이 문서와 `integrations/ai/GUIDE.md`다. `WindowsChildSession.cs`와 `GameEnvironment.cs`에는 자체 변경을 하지 않았으며 최신 main의 검증된 수정만 반영했다.
+
 2026-09-27. 완료 기준은 기존 도메인 기능을 AI에서도 호출하고, 같은 사용자 저장소에서 결과를 확인하는 것이다. 별도 AI 전용 설정/재고/작업 저장소를 만들지 않는다.
 
 ## 연결 경로
