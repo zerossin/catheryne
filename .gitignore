@@ -1,6 +1,7 @@
 **/bin/
 **/obj/
 **/__pycache__/
+*.py[cod]
 **/dist/
 **/node_modules/
 *.exe
@@ -10,9 +11,6 @@
 *.tmp
 .env*
 **/test-result.txt
-/userdata/
-/runtime/
-/backups/
 **/story-local.json
 **/launcher-settings.json
 **/unlocker-state.json
@@ -24,6 +22,8 @@
 **/runtime/
 **/backups/
 **/screenshots/
+**/captures/
+**/logs/
 **/ScannedData/
 **/GenshinDatabase/
 **/connection.json
@@ -37,9 +37,19 @@
 
 **/ai-connection.json
 **/mcp-client-config.json
+**/auth.json
 **/secrets/
 **/webview/
 **/catheryne.db*
+*.db
+*.db-wal
+*.db-shm
+*.sqlite
+*.sqlite3
+*.sqlite-wal
+*.sqlite-shm
+*.sqlite3-wal
+*.sqlite3-shm
 **/*.dpapi
 
 /apps/desktop/data/
