@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Reflection;
 using System.Windows;
 using System.Windows.Controls;
@@ -19,47 +19,86 @@ internal static class ChatLayoutTests {
   var drawing=new DrawingVisual();using(var canvas=drawing.RenderOpen())canvas.DrawRectangle(new VisualBrush(surface),null,new Rect(0,0,surface.ActualWidth,surface.ActualHeight));
   var bitmap=new RenderTargetBitmap((int)Math.Ceiling(surface.ActualWidth),(int)Math.Ceiling(surface.ActualHeight),96,96,PixelFormats.Pbgra32);bitmap.Render(drawing);var png=new PngBitmapEncoder();png.Frames.Add(BitmapFrame.Create(bitmap));using(var output=File.Create(Path.Combine(Path.GetTempPath(),name+".png")))png.Save(output);
  }
- static void Providers(Window window,WorkspaceHome workspace){
-  var panel=(AiWorkspacePanel)Field(typeof(WorkspaceHome),"aiPanel").GetValue(workspace);
-  var chat=(CodexChat)Field(typeof(WorkspaceHome),"chat").GetValue(workspace);
+ static System.Collections.Generic.Dictionary<string,object> Model(string id,string name,bool reasoning=false){return CodexChat.Map(CatheryneTools.Json().DeserializeObject(CatheryneTools.Json().Serialize(new{model=id,displayName=name,isDefault=true,defaultReasoningEffort=reasoning?"high":"",supportedReasoningEfforts=reasoning?new[]{new{reasoningEffort="low"},new{reasoningEffort="high"},new{reasoningEffort="xhigh"}}:new object[0]})));}
+ static void Await(Task task){for(int i=0;i<500&&!task.IsCompleted;i++)Wait(10);Check(task.IsCompleted,"async fixture completes");task.GetAwaiter().GetResult();}
+ static void CatalogCache(){
+  int reads=0;var pending=new TaskCompletionSource<CodexChat.ModelCatalog>();
+  using(var host=new CodexChat(Setup.DataFolder,readCatalog:kind=>{System.Threading.Interlocked.Increment(ref reads);return pending.Task;})){
+   var one=host.ProviderModels(AiProviders.Claude);var two=host.ProviderModels(AiProviders.Claude);Check(ReferenceEquals(one,two)&&!one.IsCompleted,"catalog requests share their in-flight task");
+   pending.SetResult(new CodexChat.ModelCatalog{Connected=true,Error="fixture transient failure"});Await(one);Await(host.ProviderModels(AiProviders.Claude));Check(reads==1,"error retry is bounded");
+   var times=(System.Collections.Generic.Dictionary<string,DateTime>)Field(typeof(CodexChat),"catalogTimes").GetValue(host);times[AiProviders.Claude]=DateTime.UtcNow.AddMinutes(-1);
+   pending=new TaskCompletionSource<CodexChat.ModelCatalog>();pending.SetResult(new CodexChat.ModelCatalog{Connected=true,Models=new System.Collections.Generic.List<System.Collections.Generic.Dictionary<string,object>>{Model("sonnet","Claude Sonnet")}});
+   var recovered=host.ProviderModels(AiProviders.Claude);Await(recovered);Check(reads==2&&recovered.Result.Models.Count==1&&recovered.Result.Error==null,"expired transient errors recover without logout");
+   host.InvalidateModels(AiProviders.Claude);pending=new TaskCompletionSource<CodexChat.ModelCatalog>();var stale=host.ProviderModels(AiProviders.Claude);Wait(30);var staleRead=pending;
+   host.InvalidateModels(AiProviders.Claude);pending=new TaskCompletionSource<CodexChat.ModelCatalog>();pending.SetResult(new CodexChat.ModelCatalog{Connected=false});Await(host.ProviderModels(AiProviders.Claude));
+   staleRead.SetResult(new CodexChat.ModelCatalog{Connected=true});Wait(30);Check(stale.IsCanceled&&!host.ProviderConnected(AiProviders.Claude),"stale catalog cannot restore a disconnected provider");
+  }
+ }
+ static void UnifiedModels(Window window,WorkspaceHome workspace){
+  var panel=(AiWorkspacePanel)Field(typeof(WorkspaceHome),"aiPanel").GetValue(workspace);var chat=(CodexChat)Field(typeof(WorkspaceHome),"chat").GetValue(workspace);
   var apply=typeof(WorkspaceHome).GetMethod("ApplyConnection",BindingFlags.NonPublic|BindingFlags.Instance);
-  var provider=typeof(CodexChat).GetProperty("Provider",BindingFlags.NonPublic|BindingFlags.Instance);
-  var connected=typeof(CodexChat).GetProperty("Connected",BindingFlags.NonPublic|BindingFlags.Instance);
-  var hint=Field(typeof(WorkspaceHome),"connectionHint");var originalHint=hint.GetValue(workspace);
-  var draft=(TextBox)Field(typeof(WorkspaceHome),"draft").GetValue(workspace);var originalTip=draft.ToolTip;
-  var runtime=Field(typeof(CodexChat),"findRuntime");var originalRuntime=runtime.GetValue(chat);
-  string originalProvider=chat.Provider;bool originalConnected=chat.Connected;var preferences=AppPreferences.Read();object saved;preferences.TryGetValue("aiProvider",out saved);
-  Check(panel.ProviderRequested.Method.Name=="SelectProvider","composer uses the existing provider selection owner");
-  Check(panel.Providers.Items.Cast<string>().SequenceEqual(new[]{"Codex (ChatGPT)","Claude"}),"provider list is complete");
+  var provider=typeof(CodexChat).GetProperty("Provider",BindingFlags.NonPublic|BindingFlags.Instance);var connected=typeof(CodexChat).GetProperty("Connected",BindingFlags.NonPublic|BindingFlags.Instance);
+  var hint=Field(typeof(WorkspaceHome),"connectionHint");var originalHint=hint.GetValue(workspace);var draft=(TextBox)Field(typeof(WorkspaceHome),"draft").GetValue(workspace);var originalTip=draft.ToolTip;
+  var runtime=Field(typeof(CodexChat),"findRuntime");var originalRuntime=runtime.GetValue(chat);var catalogRead=Field(typeof(CodexChat),"readCatalog");var originalRead=catalogRead.GetValue(chat);var factory=Field(typeof(CodexChat),"createClaude");var originalFactory=factory.GetValue(chat);
+  string originalProvider=chat.Provider;bool originalConnected=chat.Connected;var preferences=AppPreferences.Read();var originalLogin=panel.LoginRequested;
+  bool codexLogin=false,claudeLogin=false;int reads=0;int uiThread=System.Threading.Thread.CurrentThread.ManagedThreadId;
+  Func<string,Task<CodexChat.ModelCatalog>> read=kind=>{
+   Check(System.Threading.Thread.CurrentThread.ManagedThreadId!=uiThread,"catalog I/O stays off the UI thread");System.Threading.Interlocked.Increment(ref reads);
+   bool logged=kind==AiProviders.Codex?codexLogin:claudeLogin;return Task.FromResult(new CodexChat.ModelCatalog{Connected=logged,Models=logged?new System.Collections.Generic.List<System.Collections.Generic.Dictionary<string,object>>{kind==AiProviders.Codex?Model("fixture-codex","A long model display name for narrow layout",true):Model("sonnet","Claude Sonnet"),kind==AiProviders.Codex?Model("fixture-second","Second Codex model",true):Model("opus","Claude Opus")}:new System.Collections.Generic.List<System.Collections.Generic.Dictionary<string,object>>()});
+  };
+  Check(panel.ProviderRequested.Method.Name=="SelectProvider"&&panel.LoginRequested.Method.Name=="ConnectProvider","model/login actions share the existing owners");
   try{
-   // The real selection/save path runs with a failing fake runtime, never an account/API call.
-   runtime.SetValue(chat,new Func<Task<string>>(()=>{throw new InvalidOperationException("fixture offline");}));
-   provider.SetValue(chat,AiProviders.Claude,null);connected.SetValue(chat,false,null);apply.Invoke(workspace,null);
-   Check(panel.Providers.SelectedIndex==1&&panel.Providers.IsEnabled,"saved Claude remains visible while disconnected");
-   panel.Providers.SelectedIndex=0;for(int i=0;i<100&&((bool)Field(typeof(WorkspaceHome),"switchingProvider").GetValue(workspace));i++)Wait(10);
-   Check(chat.Provider==AiProviders.Codex&&Convert.ToString(AppPreferences.Read()["aiProvider"])==AiProviders.Codex&&panel.Providers.IsEnabled,"selection persists through the canonical path and releases after a connection failure");
-   Check(Convert.ToString(hint.GetValue(workspace))=="fixture offline","connection errors remain visible");
+   catalogRead.SetValue(chat,read);runtime.SetValue(chat,new Func<Task<string>>(()=>{throw new InvalidOperationException("fixture offline");}));
+   factory.SetValue(chat,new Func<IAiProvider>(()=>new ClaudeProvider(Setup.DataFolder,null,null,args=>Task.FromResult(CodexChat.Map(CatheryneTools.Json().DeserializeObject("{\"exitCode\":0,\"output\":\"{\\\"loggedIn\\\":true,\\\"authMethod\\\":\\\"claude.ai\\\"}\"}"))),()=>Task.FromResult("fixture.exe"))));
+   Action reload=()=>{chat.InvalidateModels(AiProviders.Codex);chat.InvalidateModels(AiProviders.Claude);Await(panel.LoadModels());Await((Task)Field(typeof(AiWorkspacePanel),"modelLoading").GetValue(panel));apply.Invoke(workspace,null);window.UpdateLayout();};
+   provider.SetValue(chat,AiProviders.Codex,null);connected.SetValue(chat,true,null);codexLogin=true;claudeLogin=true;
+   var delayed=new TaskCompletionSource<CodexChat.ModelCatalog>();catalogRead.SetValue(chat,new Func<string,Task<CodexChat.ModelCatalog>>(kind=>kind==AiProviders.Claude?delayed.Task:read(kind)));
+   chat.InvalidateModels(AiProviders.Codex);chat.InvalidateModels(AiProviders.Claude);Await(panel.LoadModels());
+   Check(!((Task)Field(typeof(AiWorkspacePanel),"modelLoading").GetValue(panel)).IsCompleted&&panel.Models.Items.OfType<ListBoxItem>().Count(x=>x.Tag is AiWorkspacePanel.ModelChoice&&((AiWorkspacePanel.ModelChoice)x.Tag).Provider==AiProviders.Codex)==2,"a slow inactive provider never blocks active models or connection setup");
+   delayed.SetResult(new CodexChat.ModelCatalog{Connected=true,Models=new System.Collections.Generic.List<System.Collections.Generic.Dictionary<string,object>>{Model("sonnet","Claude Sonnet"),Model("opus","Claude Opus")}});Await((Task)Field(typeof(AiWorkspacePanel),"modelLoading").GetValue(panel));catalogRead.SetValue(chat,read);
+   codexLogin=false;claudeLogin=false;connected.SetValue(chat,false,null);reload();
+   var choices=panel.Models.Items.OfType<ListBoxItem>().Where(x=>x.Tag is AiWorkspacePanel.ModelChoice).ToArray();
+   Check(choices.Length==2&&choices.All(x=>((AiWorkspacePanel.ModelChoice)x.Tag).Model==null),"disconnected providers contain only login entries");
+   Check(panel.ModelButton.IsVisible&&panel.ModelButton.IsEnabled,"model popup remains available before login");
+   string requestedLogin=null;panel.LoginRequested=kind=>{requestedLogin=kind;claudeLogin=true;chat.InvalidateModels(kind);return Task.FromResult(0);};
+   Await(panel.ChooseModel(new AiWorkspacePanel.ModelChoice{Provider=AiProviders.Claude}));Await((Task)Field(typeof(AiWorkspacePanel),"modelLoading").GetValue(panel));panel.LoginRequested=originalLogin;
+   Check(requestedLogin==AiProviders.Claude&&panel.Models.Items.OfType<ListBoxItem>().Count(x=>x.Tag is AiWorkspacePanel.ModelChoice&&((AiWorkspacePanel.ModelChoice)x.Tag).Provider==AiProviders.Claude)==2,"login action requests its provider and publishes models afterwards");
+   codexLogin=true;connected.SetValue(chat,true,null);reload();int cachedReads=reads;Await(panel.LoadModels());Await(panel.LoadModels());Check(reads==cachedReads,"reopening reuses bounded provider catalogs");
+   Check(panel.Models.Items.OfType<ListBoxItem>().Count(x=>x.Tag is AiWorkspacePanel.ModelChoice)==4,"both connected providers share one model list");
+   Await(panel.ChooseModel(new AiWorkspacePanel.ModelChoice{Provider=AiProviders.Codex,Model="fixture-second"}));
+   Check(chat.Model=="fixture-second"&&Convert.ToString(AppPreferences.Read()[AiProviders.Preference(AiProviders.Codex,"aiModel")])=="fixture-second","same-provider model selection persists");
+   panel.Efforts.SelectedItem="xhigh";Check(Convert.ToString(AppPreferences.Read()[AiProviders.Preference(AiProviders.Codex,"aiEffort")])=="xhigh","reasoning persists under its provider key");
+   Await(panel.ChooseModel(new AiWorkspacePanel.ModelChoice{Provider=AiProviders.Claude,Model="opus"}));
+   Check(chat.Provider==AiProviders.Claude&&chat.Model=="opus"&&chat.Connected&&Convert.ToString(AppPreferences.Read()["aiProvider"])==AiProviders.Claude&&Convert.ToString(AppPreferences.Read()[AiProviders.Preference(AiProviders.Claude,"aiModel")])=="opus","cross-provider choice switches canonically and applies the selected model");
+   Check(chat.Effort==null&&panel.Efforts.Items.Count==0,"Claude does not inherit Codex reasoning");
    foreach(string state in new[]{"busy","connecting","resuming","switchingProvider"}){
-    Field(typeof(WorkspaceHome),state).SetValue(workspace,true);apply.Invoke(workspace,null);
-    Check(!panel.Providers.IsEnabled&&ToolTipService.GetShowOnDisabled(panel.Providers)&&Convert.ToString(panel.Providers.ToolTip)==Locale.T("진행 중인 작업이 끝난 뒤 AI를 변경해 주세요."),"disabled provider explains its guard: "+state);
-    bool rejected=false;try{panel.ProviderRequested(AiProviders.Claude).GetAwaiter().GetResult();}catch(InvalidOperationException){rejected=true;}
-    Check(rejected&&chat.Provider==AiProviders.Codex,"guard cannot switch provider: "+state);Field(typeof(WorkspaceHome),state).SetValue(workspace,false);
+    Field(typeof(WorkspaceHome),state).SetValue(workspace,true);apply.Invoke(workspace,null);Check(!panel.ModelButton.IsEnabled&&!panel.Models.IsEnabled&&ToolTipService.GetShowOnDisabled(panel.ModelButton)&&Convert.ToString(panel.ModelButton.ToolTip)==Locale.T("진행 중인 작업이 끝난 뒤 AI를 변경해 주세요."),"busy choice explains its guard: "+state);
+    bool rejected=false;try{Await(panel.ChooseModel(new AiWorkspacePanel.ModelChoice{Provider=AiProviders.Codex,Model="fixture-second"}));}catch(InvalidOperationException){rejected=true;}Check(rejected&&chat.Provider==AiProviders.Claude,"busy choice cannot change providers");Field(typeof(WorkspaceHome),state).SetValue(workspace,false);apply.Invoke(workspace,null);
    }
-   foreach(string kind in new[]{AiProviders.Codex,AiProviders.Claude})foreach(bool login in new[]{false,true}){
-    provider.SetValue(chat,kind,null);connected.SetValue(chat,login,null);hint.SetValue(workspace,Locale.Format("{0} 로그인 대기 중",chat.ProviderName));apply.Invoke(workspace,null);
-    Check(panel.Providers.IsVisible&&panel.Providers.IsEnabled&&panel.Providers.SelectedIndex==(kind==AiProviders.Claude?1:0),"current provider stays visible before and after login");
-    if(!login)Check(System.Windows.Automation.AutomationProperties.GetName(draft)==Locale.Format("{0} 로그인 대기 중",chat.ProviderName),"login hint names its provider");
-    panel.Models.Items.Clear();panel.Models.Items.Add(new ComboBoxItem{Content="A long model display name for narrow layout",Tag="fixture-model"});panel.Models.SelectedIndex=0;chat.Effort="Extra high";typeof(AiWorkspacePanel).GetMethod("UpdateModelLabel",BindingFlags.NonPublic|BindingFlags.Instance).Invoke(panel,null);window.UpdateLayout();
-    var row=(Grid)panel.Providers.Parent;Check(ReferenceEquals(panel.ModelButton.Parent,row),"selector is adjacent to the model button in the composer");
-    var items=row.Children.OfType<FrameworkElement>().OrderBy(Grid.GetColumn).ToArray();double right=0,center=panel.Providers.TranslatePoint(new Point(0,18),row).Y;
-    foreach(var item in items){var point=item.TranslatePoint(new Point(),row);Check(item.ActualHeight==36&&Math.Abs(item.TranslatePoint(new Point(0,item.ActualHeight/2),row).Y-center)<1,"composer controls share 36 DIP height and center");Check(point.X>=right&&point.X+item.ActualWidth<=row.ActualWidth+1,"composer controls do not overlap or overflow");right=point.X+item.ActualWidth;}
-    Check(panel.ModelButton.TranslatePoint(new Point(),row).X-(panel.Providers.TranslatePoint(new Point(),row).X+panel.Providers.ActualWidth)>=8,"provider/model gap is at least 8 DIP");
-    Capture((FrameworkElement)((FrameworkElement)row.Parent).Parent,"catheryne-chat-provider-"+Locale.LanguageCode+"-"+(int)window.Width+"-"+kind+"-"+(login?"connected":"login"));
-    panel.Providers.IsDropDownOpen=true;Wait(20);var popup=(System.Windows.Controls.Primitives.Popup)panel.Providers.Template.FindName("PART_Popup",panel.Providers);Check(popup.IsOpen,"provider list opens in the composer");Capture((FrameworkElement)popup.Child,"catheryne-provider-list-"+Locale.LanguageCode);panel.Providers.IsDropDownOpen=false;
+   // Verify the canonical owner also refuses direct requests, even if UI is bypassed.
+   Field(typeof(WorkspaceHome),"busy").SetValue(workspace,true);bool directRejected=false;try{Await(panel.ProviderRequested(AiProviders.Codex));}catch(InvalidOperationException){directRejected=true;}Check(directRejected,"canonical provider owner guards busy work");Field(typeof(WorkspaceHome),"busy").SetValue(workspace,false);
+   Await(panel.ChooseModel(new AiWorkspacePanel.ModelChoice{Provider=AiProviders.Codex,Model="fixture-second"}));Check(!chat.Connected&&chat.Model==null&&Convert.ToString(hint.GetValue(workspace))=="fixture offline","failed connection stays visible and does not apply a model");
+   foreach(string kind in new[]{AiProviders.Codex,AiProviders.Claude})foreach(bool logged in new[]{false,true}){
+    provider.SetValue(chat,kind,null);connected.SetValue(chat,logged,null);codexLogin=logged;claudeLogin=logged;hint.SetValue(workspace,Locale.Format("{0} 로그인 대기 중",chat.ProviderName));chat.Model=kind==AiProviders.Codex?"fixture-codex":"sonnet";reload();
+    if(!logged)Check(System.Windows.Automation.AutomationProperties.GetName(draft)==Locale.Format("{0} 로그인 대기 중",chat.ProviderName),"input hint names the selected disconnected provider");
+    if(logged&&kind==AiProviders.Codex){chat.Effort="xhigh";typeof(AiWorkspacePanel).GetMethod("UpdateModelLabel",BindingFlags.NonPublic|BindingFlags.Instance).Invoke(panel,null);}
+    window.UpdateLayout();var group=(StackPanel)panel.ModelButton.Parent;var row=(DockPanel)group.Parent;var send=row.Children.OfType<Button>().Single();var controls=row.Children.OfType<StackPanel>().Single(x=>!ReferenceEquals(x,group));
+    Check(DockPanel.GetDock(group)==Dock.Right&&group.Orientation==Orientation.Horizontal,"compact model/usage group docks beside send");
+    double center=send.TranslatePoint(new Point(0,18),row).Y;
+    foreach(var item in new FrameworkElement[]{controls,panel.ModelButton,panel.Usage,send})Check(item.ActualHeight==36&&Math.Abs(item.TranslatePoint(new Point(0,18),row).Y-center)<1,"composer controls share 36 DIP height and center");
+    Check(group.TranslatePoint(new Point(group.ActualWidth,0),row).X<=send.TranslatePoint(new Point(),row).X&&group.TranslatePoint(new Point(),row).X>=controls.TranslatePoint(new Point(controls.DesiredSize.Width,0),row).X,"controls and compact group do not overlap");
+    Check(panel.ModelButton.ActualWidth<300&&panel.ModelButton.ActualWidth<=panel.ModelButton.DesiredSize.Width+1,"model button never stretches across available width");
+    Capture(window,"catheryne-models-window-"+Locale.LanguageCode+"-"+(int)window.Width+"-"+kind+"-"+(logged?"connected":"login"));
+    Capture((FrameworkElement)((FrameworkElement)row.Parent).Parent,"catheryne-chat-models-"+Locale.LanguageCode+"-"+(int)window.Width+"-"+kind+"-"+(logged?"connected":"login"));
+    panel.ModelButton.RaiseEvent(new RoutedEventArgs(Button.ClickEvent));Wait(40);var popup=(System.Windows.Controls.Primitives.Popup)Field(typeof(AiWorkspacePanel),"modelPopup").GetValue(panel);Check(popup.IsOpen,"unified model popup opens before and after login");Capture((FrameworkElement)popup.Child,"catheryne-model-list-"+Locale.LanguageCode+"-"+(int)window.Width+"-"+kind+"-"+(logged?"connected":"login"));popup.IsOpen=false;
    }
+   // Clearing a connection invalidates its models and returns the login entry.
+   claudeLogin=false;provider.SetValue(chat,AiProviders.Claude,null);connected.SetValue(chat,false,null);reload();Check(panel.Models.Items.OfType<ListBoxItem>().Single(x=>x.Tag is AiWorkspacePanel.ModelChoice&&((AiWorkspacePanel.ModelChoice)x.Tag).Provider==AiProviders.Claude).Content.ToString()==Locale.T("로그인"),"disconnect removes that provider's model rows");
   }finally{
    foreach(string state in new[]{"busy","connecting","resuming","switchingProvider"})Field(typeof(WorkspaceHome),state).SetValue(workspace,false);
-   runtime.SetValue(chat,originalRuntime);provider.SetValue(chat,originalProvider,null);connected.SetValue(chat,originalConnected,null);hint.SetValue(workspace,originalHint);draft.ToolTip=originalTip;AppPreferences.Set("aiProvider",saved);panel.Models.Items.Clear();chat.Model=null;chat.Effort=null;apply.Invoke(workspace,null);
+   var transport=(IAiProvider)Field(typeof(CodexChat),"providerTransport").GetValue(chat);if(transport!=null)transport.Dispose();Field(typeof(CodexChat),"providerTransport").SetValue(chat,null);
+   runtime.SetValue(chat,originalRuntime);catalogRead.SetValue(chat,originalRead);factory.SetValue(chat,originalFactory);panel.LoginRequested=originalLogin;provider.SetValue(chat,originalProvider,null);connected.SetValue(chat,originalConnected,null);hint.SetValue(workspace,originalHint);draft.ToolTip=originalTip;
+   foreach(string key in new[]{"aiProvider","aiModel","aiEffort","claudeModel","claudeEffort"}){object saved;preferences.TryGetValue(key,out saved);AppPreferences.Set(key,saved);}panel.Models.Items.Clear();chat.Model=null;chat.Effort=null;apply.Invoke(workspace,null);
   }
  }
  static void Accounts(Window window,WorkspaceHome workspace){
@@ -93,20 +132,21 @@ internal static class ChatLayoutTests {
   var between=window.PointToScreen(new Point(500,20));Check(SendMessage(hwnd,0x84,IntPtr.Zero,Packed(between)).ToInt32()==2,"unused header retains native dragging and double-click hit testing");
  }
  internal static void Run(Window window,WorkspaceHome workspace){
+  CatalogCache();
   var menu=(Border)window.FindName("WorkspaceMenu");var chat=(Border)window.FindName("WorkspaceHome");double width=window.Width,minWidth=window.MinWidth;
   // The hosted runner can have a smaller desktop than the wide-layout fixture.
   // Set the fixture minimum too so native restore cannot clamp its requested viewport.
   Action<double> resize=value=>{window.MinWidth=value;window.Width=value;Wait(300);Check(Math.Abs(window.ActualWidth-value)<1,"fixture viewport: expected "+value+", actual "+window.ActualWidth);};
   Action<double> margin=left=>{window.UpdateLayout();var expected=new Thickness(left,LauncherWindowLayout.ChatTop,18,84);Check((Thickness)chat.GetAnimationBaseValue(FrameworkElement.MarginProperty)==expected&&chat.Margin==expected,"transcript and composer reservation: expected "+expected+", base "+chat.GetAnimationBaseValue(FrameworkElement.MarginProperty)+", current "+chat.Margin+", viewport "+window.ActualWidth+", state "+window.WindowState);};
   try{
-   resize(1240);workspace.Show("설정");Wait(300);margin(258);Caption(window);Accounts(window,workspace);Providers(window,workspace);Wait(300);margin(258);
+   resize(1240);workspace.Show("설정");Wait(300);margin(258);Caption(window);Accounts(window,workspace);UnifiedModels(window,workspace);Wait(300);margin(258);
    Check(chat.TranslatePoint(new Point(),window).X>=menu.TranslatePoint(new Point(menu.ActualWidth,0),window).X,"wide chat must remain to the right of the menu: chat "+chat.TranslatePoint(new Point(),window).X+", menu right "+menu.TranslatePoint(new Point(menu.ActualWidth,0),window).X+", menu width "+menu.ActualWidth+", visibility "+chat.Visibility+", window "+window.ActualWidth);
    DrawerMotion.Hide(menu);Wait(20);workspace.EnsureMenu("설정");Wait(300);Check(DrawerMotion.IsOpen(menu),"reopening the same menu must cancel its pending close");margin(258);
    // Recomputed geometry must be recoverable even when the requested destination did not change.
    chat.BeginAnimation(FrameworkElement.MarginProperty,null);chat.Margin=new Thickness(18,LauncherWindowLayout.ChatTop,18,84);workspace.EnsureMenu("설정");Wait(300);margin(258);
    foreach(string route in new[]{"플레이","내 계정","캘린더","설정"}){workspace.HideMenu();workspace.Show(route);Wait(15);}Wait(300);margin(258);
-   resize(980);margin(18);Caption(window);Accounts(window,workspace);Providers(window,workspace);Check(DrawerMotion.IsOpen(menu),"narrow layout must retain the overlay menu");
-   resize(780);margin(18);Providers(window,workspace);
+   resize(980);margin(18);Caption(window);Accounts(window,workspace);UnifiedModels(window,workspace);Check(DrawerMotion.IsOpen(menu),"narrow layout must retain the overlay menu");
+   resize(780);margin(18);UnifiedModels(window,workspace);
    resize(1240);margin(258);
    var feature=(Border)window.FindName("CompanionPage");DrawerMotion.Show(feature);Wait(250);Check(chat.Visibility==Visibility.Collapsed,"a detail panel must keep covering chat");DrawerMotion.Hide(feature);Wait(250);Check(chat.Visibility==Visibility.Visible,"chat must return after the detail panel closes");margin(258);
    workspace.HideMenu();Wait(300);margin(18);

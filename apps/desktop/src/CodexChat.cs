@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Diagnostics;
@@ -22,20 +22,22 @@ internal sealed class CodexChat : IDisposable {
  Process process;StreamWriter input;Task readerTask,errorTask;int sequence;bool ready,disposed,restarting,threadLoaded;string transportError;
  internal event Action<string,Dictionary<string,object>> Notification;
  internal string Workspace {get{return Provider==AiProviders.Claude?Path.Combine(dataRoot,"ai-workspace","claude"):Path.Combine(dataRoot,"ai-workspace");}} readonly string dataRoot;readonly Func<Task<string>> findRuntime;readonly Action<object> sendWire;
- internal CodexChat(string root=null,Func<Task<string>> findRuntime=null,Action<object> sendWire=null){Provider=AiProviders.Codex;this.sendWire=sendWire;dataRoot=root??Setup.DataFolder;this.findRuntime=findRuntime??(()=>Task.Run(()=>Find()));}
+ readonly Func<IAiProvider> createClaude;
+ readonly Func<string,Task<ModelCatalog>> readCatalog;
+ internal CodexChat(string root=null,Func<Task<string>> findRuntime=null,Action<object> sendWire=null,string initialProvider=AiProviders.Codex,Func<IAiProvider> createClaude=null,Func<string,Task<ModelCatalog>> readCatalog=null){Provider=initialProvider;this.sendWire=sendWire;dataRoot=root??Setup.DataFolder;this.findRuntime=findRuntime??(()=>Task.Run(()=>Find()));this.createClaude=createClaude??(()=>new ClaudeProvider(dataRoot,ProviderNotification,ExecuteTool));this.readCatalog=readCatalog;if(initialProvider==AiProviders.Claude)providerTransport=this.createClaude();}
  internal string ThreadId,TurnId,Model,Effort;
  internal string ProjectId;
  internal string Provider {get;private set;}
  internal string ProviderName {get{return AccountConnections.Name(Provider);}}
  IAiProvider providerTransport;
  readonly Dictionary<string,bool> connectedProviders=new Dictionary<string,bool>();
- internal bool ProviderConnected(string provider){bool connected;return provider==Provider?Connected:connectedProviders.TryGetValue(provider,out connected)&&connected;}
+ internal bool ProviderConnected(string provider){lock(catalogGate){bool connected;return provider==Provider?Connected:connectedProviders.TryGetValue(provider,out connected)&&connected;}}
  internal async Task SelectProvider(string provider){
   if(!AiProviders.IsChat(provider))throw new ArgumentException("Unknown chat provider");if(provider==Provider)return;
   if(TurnId!=null||await Task.Run(()=>new AiTaskStore(dataRoot).List().Any(t=>t.State=="running"&&(t.Action=="game_control"||t.Action=="scanner"||t.Thread==ThreadId))))throw new InvalidOperationException(Locale.T("진행 중인 작업이 끝난 뒤 AI를 변경해 주세요."));
-  connectedProviders[Provider]=Connected;await toolGate.WaitAsync();try{await CloseTransport();if(providerTransport!=null){providerTransport.Dispose();providerTransport=null;}}finally{toolGate.Release();}
+  lock(catalogGate)connectedProviders[Provider]=Connected;await toolGate.WaitAsync();try{await CloseTransport();if(providerTransport!=null){providerTransport.Dispose();providerTransport=null;}}finally{toolGate.Release();}
   New();Provider=provider;Connected=false;ProjectId=null;Model=null;Effort=null;historyCache=null;historyLoading=null;historyFetched=DateTime.MinValue;
-  if(provider==AiProviders.Claude)providerTransport=new ClaudeProvider(dataRoot,ProviderNotification,ExecuteTool);
+  if(provider==AiProviders.Claude)providerTransport=createClaude();
  }
  void ProviderNotification(string name,Dictionary<string,object> data){
   if(name=="turn/started"&&S(data,"threadId")==ThreadId)TurnId=S(Map(data["turn"]),"id");
@@ -199,8 +201,43 @@ internal sealed class CodexChat : IDisposable {
   return reset;
  }
  internal async Task<List<Dictionary<string,object>>> Models(){await Start();var result=await Call("model/list",new{limit=100,includeHidden=false});return Items(result["data"]).ToList();}
- internal async Task<bool> Account(){string provider=Provider;await Start();if(provider!=Provider)throw new OperationCanceledException();var result=await Call("account/read",new{refreshToken=false});if(provider!=Provider)throw new OperationCanceledException();Connected=result.ContainsKey("account")&&result["account"]!=null;connectedProviders[Provider]=Connected;return Connected;}
- internal async Task Logout(){await Start();await Call("account/logout",null);Connected=false;Emit("account/updated",new Dictionary<string,object>());}
+ internal sealed class ModelCatalog {
+  internal bool Connected;internal List<Dictionary<string,object>> Models=new List<Dictionary<string,object>>();internal string Error;
+ }
+ readonly object catalogGate=new object();
+ readonly Dictionary<string,ModelCatalog> catalogs=new Dictionary<string,ModelCatalog>();
+ readonly Dictionary<string,Task<ModelCatalog>> catalogLoads=new Dictionary<string,Task<ModelCatalog>>();
+ internal void InvalidateModels(string provider){lock(catalogGate){catalogs.Remove(provider);catalogLoads.Remove(provider);}}
+ readonly Dictionary<string,DateTime> catalogTimes=new Dictionary<string,DateTime>();
+ internal Task<ModelCatalog> ProviderModels(string provider){
+  if(!AiProviders.IsChat(provider))throw new ArgumentException("Unknown chat provider");
+  lock(catalogGate){
+   ModelCatalog cached;DateTime fetched;
+   if(catalogs.TryGetValue(provider,out cached)&&catalogTimes.TryGetValue(provider,out fetched)&&DateTime.UtcNow-fetched<TimeSpan.FromSeconds(cached.Error==null?900:30))return Task.FromResult(cached);
+   Task<ModelCatalog> loading;if(catalogLoads.TryGetValue(provider,out loading))return loading;
+   var completion=new TaskCompletionSource<ModelCatalog>(TaskCreationOptions.RunContinuationsAsynchronously);catalogLoads[provider]=completion.Task;
+   // Metadata only: reuse Account/Models and the official adapters without changing
+   // the active conversation. No login, thread, turn, or input is started here.
+   var read=Task.Run(async()=>{
+    ModelCatalog value;
+    try{
+     if(readCatalog!=null)value=await readCatalog(provider).ConfigureAwait(false);
+     else using(var reader=new CodexChat(dataRoot,findRuntime,initialProvider:provider)){
+      value=new ModelCatalog{Connected=await reader.Account().ConfigureAwait(false)};
+      if(value.Connected)value.Models=await reader.Models().ConfigureAwait(false);
+     }
+    }catch(Exception error){value=new ModelCatalog{Connected=ProviderConnected(provider),Error=error.Message};}
+    lock(catalogGate){Task<ModelCatalog> current;
+     if(!disposed&&catalogLoads.TryGetValue(provider,out current)&&ReferenceEquals(current,completion.Task)){
+      catalogLoads.Remove(provider);catalogs[provider]=value;catalogTimes[provider]=DateTime.UtcNow;connectedProviders[provider]=value.Connected;
+     }else{completion.TrySetCanceled();return;}
+    }
+    completion.TrySetResult(value);
+   });return completion.Task;
+  }
+ }
+ internal async Task<bool> Account(){string provider=Provider;await Start();if(provider!=Provider)throw new OperationCanceledException();var result=await Call("account/read",new{refreshToken=false});if(provider!=Provider)throw new OperationCanceledException();bool connected=result.ContainsKey("account")&&result["account"]!=null;lock(catalogGate){bool prior;if(!connectedProviders.TryGetValue(provider,out prior)||prior!=connected)InvalidateModels(provider);Connected=connected;connectedProviders[provider]=connected;}return Connected;}
+ internal async Task Logout(){await Start();await Call("account/logout",null);lock(catalogGate){Connected=false;connectedProviders[Provider]=false;InvalidateModels(Provider);}Emit("account/updated",new Dictionary<string,object>());}
  internal async Task Login(){await Start();if(providerTransport!=null){await providerTransport.Login();await Account();Emit("account/login/completed",new Dictionary<string,object>());return;}var result=await Call("account/login/start",new{type="chatgpt"});string url=S(result,"authUrl");if(!AiProviders.LoginAddress(url,Provider))throw new InvalidOperationException(Locale.T("공식 로그인 주소를 확인하지 못했습니다."));Process.Start(new ProcessStartInfo(url){UseShellExecute=true});}
  async Task<Dictionary<string,object>> FindProject(){
    var all=new List<Dictionary<string,object>>();string cursor=null;

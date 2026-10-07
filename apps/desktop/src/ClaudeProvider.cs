@@ -85,6 +85,8 @@ internal sealed class ClaudeProvider : IAiProvider {
    return D(new{account=exit==0&&AccountStatus(value)?new{type="claude"}:null});
   }
   if(method=="account/logout"){if(running!=null||login!=null)throw new InvalidOperationException(Locale.T("진행 중인 작업이 끝난 뒤 AI를 변경해 주세요."));var result=await Auth(new[]{"auth","logout"});if(Convert.ToInt32(result["exitCode"])!=0)throw new InvalidOperationException(Locale.T("Claude 연결을 해제하지 못했습니다."));return new Dictionary<string,object>();}
+  // Official model aliases, resolved by the installed CLI rather than pinned API IDs:
+  // https://code.claude.com/docs/en/model-config#model-aliases
   if(method=="model/list")return D(new{data=new[]{new{model="sonnet",displayName="Claude Sonnet",isDefault=true,defaultReasoningEffort="",supportedReasoningEfforts=new object[0]},new{model="opus",displayName="Claude Opus",isDefault=false,defaultReasoningEffort="",supportedReasoningEfforts=new object[0]},new{model="haiku",displayName="Claude Haiku",isDefault=false,defaultReasoningEffort="",supportedReasoningEfforts=new object[0]}}});
   if(method=="account/rateLimits/read")throw new InvalidOperationException(Locale.T("Claude Code는 이 연결에서 계정 한도 조회를 제공하지 않습니다."));
   if(method=="project/list")return D(new{data=new[]{new{id="claude",roots=new[]{new{path=workspace}}}}});
